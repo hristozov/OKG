@@ -34,6 +34,7 @@ void buffer_kill();
 void add_point(float, float, float);
 void drawpolygons();
 void mouse(int, int, int, int);
+void reshape(int, int);
 void render();
 
 /* Инициализация на vertex буфера */
@@ -160,6 +161,13 @@ void mouse (int button, int state, int mx, int my) {
 	}
 }
 
+/* Callback за смяна на размера на прозореца */
+void reshape(int x, int y) {
+	g_x = x; g_y = y;
+	glViewport(0, 0, g_x/VIEWPORT_FACTOR, g_y);
+	glutPostRedisplay();
+}
+
 /* Рендване на сцената */
 void render() {
 	printf("Call to render() with %lu points\n", buffer_size);
@@ -180,13 +188,6 @@ void render() {
 	drawpolygons();
 	
 	glFlush();
-}
-
-/* Callback за смяна на размера на прозореца */
-void reshape(int x, int y) {
-	g_x = x; g_y = y;
-	glViewport(0, 0, g_x/VIEWPORT_FACTOR, g_y);
-	glutPostRedisplay();
 }
 
 int main(int argc, char **argv) {
