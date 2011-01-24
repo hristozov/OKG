@@ -170,7 +170,7 @@ void drawpolygons() {
 	for (int i=0; i < buffer_size-1; i++)
 		for (int j=0; j < NO_SEGMENTS-1; j++) {
 			/*
-			 * Добавяме нов полигон (всъщност правоъгълник) чрез следните 4 точки:
+			 * Добавяме нов полигон (всъщност трапец) чрез следните 4 точки:
 			 * vertex_buffer[i][j];
 			 * vertex_buffer[i][j+1];
 			 * vertex_buffer[i+1][j];
@@ -179,6 +179,21 @@ void drawpolygons() {
 			 */
 			glBegin(GL_TRIANGLE_STRIP);
 				glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, model_color);
+				
+				/* Координати на векторите от [i][j] до [i+1][j], и от [i][j] до [i][j+1] */
+				float vector1_x = vertex_buffer[i+1][j].x - vertex_buffer[i][j].x,
+					  vector1_y = vertex_buffer[i+1][j].y - vertex_buffer[i][j].y,
+					  vector1_z = vertex_buffer[i+1][j].z - vertex_buffer[i][j].z,
+					  vector2_x = vertex_buffer[i][j+1].x - vertex_buffer[i][j].x,
+					  vector2_y = vertex_buffer[i][j+1].y - vertex_buffer[i][j].y,
+					  vector2_z = vertex_buffer[i][j+1].z - vertex_buffer[i][j].z;
+					  
+				/* Нормалният вектор на равнината на трапеца е векторното произведение на двата вече получени вектора */
+				glNormal3f(vector1_y*vector2_z - vector1_z*vector2_y,
+						   vector1_z*vector2_x - vector1_x*vector2_z,
+						   vector1_x*vector2_y - vector1_y*vector2_x);
+				
+				/* Сега вече добавяме върховете на трапеца */
 				glVertex3f(vertex_buffer[i][j].x,vertex_buffer[i][j].y,vertex_buffer[i][j].z);
 				glVertex3f(vertex_buffer[i+1][j].x,vertex_buffer[i+1][j].y,vertex_buffer[i+1][j].z);
 				glVertex3f(vertex_buffer[i][j+1].x,vertex_buffer[i][j+1].y,vertex_buffer[i][j+1].z);
