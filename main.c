@@ -7,7 +7,7 @@
 #include <GL/glu.h>
 
 /* NO_SEGMENTS определя колко страни трябва да имат многоъгълниците, с които апроксимираме окръжностите около оста */
-#define NO_SEGMENTS 360
+#define NO_SEGMENTS 36
 
 /* g_x и g_y регулират размера на прозореца */
 int g_x = 800;
@@ -27,6 +27,9 @@ struct point {
 /* Глобалният буфер, в който съхраняваме всички vertex-и */
 size_t buffer_size;
 struct point **vertex_buffer;
+
+/* Градусите за ротиране на "слънцето" */
+int alpha_degrees = 0;
 
 void buffer_init();
 void buffer_resize(size_t);
@@ -114,14 +117,56 @@ void add_point(float x, float y, float z) {
 
 /* ----------========== Кодът за рендване ==========---------- */
 
+/* lights() наглася източника на осветление */
+void lights() {
+	static float near_white[] = {.45f, .45f, .5f, 1.f};
+	static float orange[] = {.4f, .3f, .1f, 1.f};
+
+	static float black[] = {.0f, .0f, .0f, 1.f};
+	static float white[] = {1.f, 1.f, 1.f, 1.f};
+	static float yellow[] = {.99f, .8f, .0f, 1.f};
+
+	static float pos[] = {0.f, 0.f, 0.f, 1.f};
+
+	glEnable(GL_LIGHTING);
+    glLightModelfv( GL_LIGHT_MODEL_AMBIENT, black ); 
+
+	glEnable(GL_LIGHT0);
+	glLightfv(GL_LIGHT0, GL_AMBIENT, near_white);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, orange);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, black);
+	
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+
+	glRotatef(28, 0, 0, 1);
+	glRotatef(alpha_degrees,0,1,0);
+	glTranslatef(-25,0,0);
+	
+	glLightfv(GL_LIGHT0, GL_POSITION, pos);
+
+	glMaterialfv(GL_FRONT, GL_EMISSION, yellow);
+	glutSolidSphere(3,20,20);
+	glMaterialfv(GL_FRONT, GL_EMISSION, black);
+
+	glPopMatrix();
+}
+
 /* drawpolygons() създава всички полигони, по които ще бъде нарисувано ротационното тяло */
 void drawpolygons() {
-	glEnable(GL_POLYGON_SMOOTH);
-	glEnable(GL_LINE_SMOOTH);
-	
 	if (buffer_size < 1) /* Is the buffer empty? */
 		return;
 		
+	float model_color[] = {1, .2, .2};
+	
+	glEnable(GL_POLYGON_SMOOTH);
+	glEnable(GL_LINE_SMOOTH);
+	
+	glShadeModel(GL_FLAT);
+	
+	glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER,1);
+	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE,0);
+			
 	for (int i=0; i < buffer_size-1; i++)
 		for (int j=0; j < NO_SEGMENTS-1; j++) {
 			/*
@@ -133,7 +178,7 @@ void drawpolygons() {
 			 * Забележка: Функциите glBegin(), glColor3f() и glEnd() могат да бъдат извадени извън цикъла при използване на GL_QUADS
 			 */
 			glBegin(GL_TRIANGLE_STRIP);
-				glColor3f(1,.2,.2);
+				glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, model_color);
 				glVertex3f(vertex_buffer[i][j].x,vertex_buffer[i][j].y,vertex_buffer[i][j].z);
 				glVertex3f(vertex_buffer[i+1][j].x,vertex_buffer[i+1][j].y,vertex_buffer[i+1][j].z);
 				glVertex3f(vertex_buffer[i][j+1].x,vertex_buffer[i][j+1].y,vertex_buffer[i][j+1].z);
@@ -178,7 +223,14 @@ void mouse (int button, int state, int mx, int my) {
 /* Callback за смяна на размера на прозореца */
 void reshape(int x, int y) {
 	g_x = x; g_y = y;
+	printf("Changed g_x=%d g_y=%d\n", g_x, g_y);
 	glViewport(0, 0, g_x/VIEWPORT_FACTOR, g_y);
+	glutPostRedisplay();
+}
+
+void timer(int foo) {
+	alpha_degrees += 3;
+	glutTimerFunc(30,timer,0);
 	glutPostRedisplay();
 }
 
@@ -203,11 +255,13 @@ void render() {
 	glLoadIdentity();
 
 	gluPerspective(60,1,2,200);
-	gluLookAt(1,1,+20,0,7,0,0,1,0);
+	gluLookAt(1,1,+40,0,7,0,0,1,0);
 	
+	lights();
 	drawmodel();
 	
 	glFlush();
+	glutSwapBuffers();
 }
 
 int main(int argc, char **argv) {
@@ -231,6 +285,7 @@ int main(int argc, char **argv) {
 	
 	glutDisplayFunc(render);
 	glutMouseFunc(mouse);
+	glutTimerFunc(20, timer, 0);
 	
 	glutMainLoop();
 	
