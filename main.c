@@ -6,8 +6,8 @@
 #include <GL/glut.h>
 #include <GL/glu.h>
 
-/* NO_SEGMENTS определя колко страни трябва да имат многоъгълниците, с които апроксимираме окръжностите около оста */
-#define NO_SEGMENTS 72
+/* no_segments определя колко страни трябва да имат многоъгълниците, с които апроксимираме окръжностите около оста */
+size_t no_segments = 72;
 
 /* g_x и g_y регулират размера на прозореца */
 int g_x = 800;
@@ -69,7 +69,7 @@ void buffer_resize(size_t new_size) {
 			exit(-1);
 		
 		for (size_t i = buffer_size; i < new_size; i++)
-			if ((vertex_buffer[i] = (struct point*) calloc(NO_SEGMENTS, sizeof(struct point))) == NULL)
+			if ((vertex_buffer[i] = (struct point*) calloc(no_segments, sizeof(struct point))) == NULL)
 				exit(-1);
 		
 		buffer_size = new_size;
@@ -99,9 +99,9 @@ void add_point(float x, float y, float z) {
 	/* Разстоянието от оста */
 	float r = sqrtf(x*x + z*z);
 	
-	for (size_t i = 0; i < NO_SEGMENTS; i++) {
+	for (size_t i = 0; i < no_segments; i++) {
 		/* Ъгълът на текущия сегмент */
-		float angle = (2.0f * M_PI * (float)i) / (float)NO_SEGMENTS;
+		float angle = (2.0f * M_PI * (float)i) / (float)no_segments;
 		
 		/* 
 		 * Изчисляваме координатите на текущата точка
@@ -168,7 +168,7 @@ void drawpolygons() {
 	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE,0);
 			
 	for (int i=0; i < buffer_size-1; i++)
-		for (int j=0; j < NO_SEGMENTS-1; j++) {
+		for (int j=0; j < no_segments-1; j++) {
 			/*
 			 * Добавяме нов полигон (всъщност трапец) чрез следните 4 точки:
 			 * vertex_buffer[i][j];
@@ -281,6 +281,10 @@ void render() {
 
 int main(int argc, char **argv) {
 	buffer_init();
+	
+	/* Като първи аргумент може да се зададе нова стойност на детайлността */
+	if (argc > 1)
+		no_segments = (unsigned) atoi(argv[1]);
 	
 	add_point(0.f, 0.f, 0.f);
 	add_point(1.5f, 2.f, 0.f);
