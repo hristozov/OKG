@@ -176,7 +176,6 @@ void render() {
 
 	gluPerspective(60,1,2,200);
 	gluLookAt(1,1,+20,0,7,0,0,1,0);
-	//gluLookAt(2,2,20,0,0,0,0,1,0);
 	
 	drawpolygons();
 	
@@ -192,13 +191,6 @@ void reshape(int x, int y) {
 
 int main(int argc, char **argv) {
 	buffer_init();
-	
-	// add_point(0, 0, 0);
-	
-	/*add_point(1.f, 2.f, 0.f);
-	add_point(2.f, 7.f, 0.f);
-	add_point(3.f, 9.f, 0.f);
-	add_point(4.f, 7.f, 0.f);*/
 	
 	add_point(0.f, 0.f, 0.f);
 	add_point(1.5f, 2.f, 0.f);
