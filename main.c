@@ -142,6 +142,20 @@ void drawpolygons() {
 		}
 }
 
+/* drawmodel() рисува ротационното тяло */
+void drawmodel() {
+	drawpolygons();
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+		glRotatef(90,0,1,0);
+		drawpolygons();
+		glRotatef(90,0,1,0);
+		drawpolygons();
+		glRotatef(90,0,1,0);
+		drawpolygons();
+	glPopMatrix();
+}
+
 /* Callback за действията с мишката */
 void mouse (int button, int state, int mx, int my) {
 	if(button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
@@ -182,10 +196,16 @@ void render() {
 	
 	glEnable(GL_DEPTH_TEST);
 
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+
 	gluPerspective(60,1,2,200);
 	gluLookAt(1,1,+20,0,7,0,0,1,0);
 	
-	drawpolygons();
+	drawmodel();
 	
 	glFlush();
 }
