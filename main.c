@@ -162,7 +162,7 @@ void drawpolygons() {
 	glEnable(GL_POLYGON_SMOOTH);
 	glEnable(GL_LINE_SMOOTH);
 	
-	glShadeModel(GL_FLAT);
+	glShadeModel(GL_SMOOTH);
 	
 	glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER,1);
 	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE,0);
