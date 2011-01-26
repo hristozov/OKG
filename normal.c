@@ -71,8 +71,8 @@ void vertex_normal(size_t i, size_t j) {
 /* Изчислява и записва в буфера нормалните вектори на всички върхове */
 void calculate_vertex_normals() {
 	printf("Calculating vertex normals...\n");
-	for (int i=0; i < buffer_size; i++)
-		for (int j=0; j < no_segments; j++)
+	for (size_t i=0; i < buffer_size; i++)
+		for (size_t j=0; j < no_segments; j++)
 			vertex_normal(i, j);
 }
 
