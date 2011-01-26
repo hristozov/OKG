@@ -78,7 +78,7 @@ void drawpolygons() {
 	glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER,1);
 	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE,0);
 			
-	for (int i=0; i < polygon_size; i++) {
+	for (size_t i=0; i < polygon_size; i++) {
 			/*
 			 * Добавяме нов полигон (всъщност трапец) от буфера
 			 */
@@ -90,7 +90,7 @@ void drawpolygons() {
 				/* Сега вече добавяме върховете на трапеца */
 				#ifdef SMOOTH_SHADING
 					/* В този случай викаме glNormal3f преди всеки glVertex3f */
-					for (int j=0; j < 4; j++) {
+					for (size_t j=0; j < 4; j++) {
 						glNormal3f(cur->v[j]->normal.x, cur->v[j]->normal.y, cur->v[j]->normal.z);
 						glVertex3f(cur->v[j]->coord.x, cur->v[j]->coord.y, cur->v[j]->coord.z);
 					}
@@ -98,7 +98,7 @@ void drawpolygons() {
 					/* Изчисляваме нормален вектор само за целия трапец */
 					glNormal3f(cur->normal.x, cur->normal.y, cur->normal.z);
 					
-					for (int j=0; j < 4; j++)
+					for (size_t j=0; j < 4; j++)
 						glVertex3f(cur->v[j]->coord.x, cur->v[j]->coord.y, cur->v[j]->coord.z);
 				#endif
 			glEnd();

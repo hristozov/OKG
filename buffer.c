@@ -48,7 +48,7 @@ void vertex_buffer_resize(size_t new_size) {
 
 /* Освобождаване на паметта */
 void buffer_kill() {
-	for (int i=0; i < buffer_size; i++) {
+	for (size_t i=0; i < buffer_size; i++) {
 		free(vertex_buffer[i]);
 	}
 	free(vertex_buffer);
@@ -97,7 +97,7 @@ void add_point(float x, float y, float z) {
 void add_polygon_ptr_to_vertex(struct polygon *p, struct vertex *v) {
 	if (p == NULL || v == NULL)
 		return;
-	for (int i=0; i<4; i++) {
+	for (size_t i=0; i<4; i++) {
 		if (v->p[i] != NULL) {
 			if (v->p[i] == p)
 				return;
