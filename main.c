@@ -11,21 +11,6 @@
 
 #define SMOOTH_SHADING 1
 
-/* g_x и g_y регулират размера на прозореца */
-int g_x = 800;
-int g_y = 600;
-
-/* VIEWPORT_FACTOR се използва за определяне на това в каква пропорция ще разделяме екрана на две части */
-#define VIEWPORT_FACTOR 1.5
-
-/* Големина на числовия интервал, в който да се проектират точките, избрани с мишката */
-#define PROJECT_INTERVAL_X 10.f
-#define PROJECT_INTERVAL_Y 10.f
-
-/* Целта на по-долните макроси е да проектира координатите (x,y) в интервали, избрани с PROJECT_INTERVAL_* */
-#define PROJECT_IN_X(x) ((float)(((x)-(g_x/VIEWPORT_FACTOR))*(PROJECT_INTERVAL_X/(g_x-g_x/VIEWPORT_FACTOR))))
-#define PROJECT_IN_Y(y) (PROJECT_INTERVAL_Y - (float)((y)*(PROJECT_INTERVAL_Y/g_y)))
-
 /* Градусите за ротиране на "слънцето" */
 int alpha_degrees = 0;
 
@@ -152,7 +137,7 @@ void drawmodel() {
 /* Callback за действията с мишката */
 void mouse (int button, int state, int mx, int my) {
 	if(button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
-		if (mx <= g_x/VIEWPORT_FACTOR) { /* Точката е във viewport-а на ротационното тяло */
+		if (IS_IN_LEFT_VIEWPORT(mx)) { /* Точката е във viewport-а на ротационното тяло */
 			printf("Control point position is in viewport; ignoring!\n");
 			return;
 		}
@@ -171,7 +156,7 @@ void mouse (int button, int state, int mx, int my) {
 void reshape(int x, int y) {
 	g_x = x; g_y = y;
 	printf("Changed g_x=%d g_y=%d\n", g_x, g_y);
-	glViewport(0, 0, g_x/VIEWPORT_FACTOR, g_y);
+	glViewport(0, 0, VIEWPORT_BORDER, g_y);
 	glutPostRedisplay();
 }
 
@@ -184,7 +169,7 @@ void timer(int foo) {
 /* Рендване на сцената */
 void render() {
 	printf("Call to render() with %lu points\n", buffer_size);
-	glViewport(0, 0, g_x/VIEWPORT_FACTOR, g_y);
+	glViewport(0, 0, VIEWPORT_BORDER, g_y);
 	
 	glClearColor(0.f,0.f,0.f,0.f);
 	glClearDepth(10);
