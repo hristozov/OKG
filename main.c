@@ -63,10 +63,6 @@ void drawpolygons() {
 		
 	struct polygon *cur;
 		
-	#ifndef SMOOTH_SHADING
-		struct point normal;
-	#endif
-	
 	/* Цвят на полигоните, които ще нарисуваме */
 	float model_color[] = {1, .2, .2};
 	
@@ -100,7 +96,7 @@ void drawpolygons() {
 					}
 				#else
 					/* Изчисляваме нормален вектор само за целия трапец */
-					glNormal3f(cur->normal.x, cur->normal.y, normal.z);
+					glNormal3f(cur->normal.x, cur->normal.y, cur->normal.z);
 					
 					for (int j=0; j < 4; j++)
 						glVertex3f(cur->p[j]->coord.x, cur->p[j]->coord.y, cur->p[j]->coord.z);
