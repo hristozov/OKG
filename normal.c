@@ -31,8 +31,7 @@ void calculate_normal(struct point *start, struct point *end1, struct point *end
  * i-1 j-1 | i-1 j | i-1 j+1
  */
 void vertex_normal(size_t i, size_t j) {
-	struct point normal1, normal2, normal3, normal4;
-	struct vertex *cur = vertex_buffer[i][j];
+	struct vertex *cur = &vertex_buffer[i][j];
 	size_t nelem = 0;
 	float sum_x = 0, sum_y = 0, sum_z = 0;
 	
@@ -48,9 +47,9 @@ void vertex_normal(size_t i, size_t j) {
 	for (int i=0; i<4; i++) {
 		if (cur->p[i] == NULL)
 			break;
-		sum_x += cur->p[i].normal.x;
-		sum_y += cur->p[i].normal.y;
-		sum_z += cur->p[i].normal.z;
+		sum_x += cur->p[i]->normal.x;
+		sum_y += cur->p[i]->normal.y;
+		sum_z += cur->p[i]->normal.z;
 		nelem++;
 	}
 	
