@@ -91,8 +91,8 @@ void drawpolygons() {
 				#ifdef SMOOTH_SHADING
 					/* В този случай викаме glNormal3f преди всеки glVertex3f */
 					for (int j=0; j < 4; j++) {
-						glNormal3f(cur->p[j]->normal.x, cur->p[j]->normal.y, cur->p[j]->normal.z);
-						glVertex3f(cur->p[j]->coord.x, cur->p[j]->coord.y, cur->p[j]->coord.z);
+						glNormal3f(cur->v[j]->normal.x, cur->v[j]->normal.y, cur->v[j]->normal.z);
+						glVertex3f(cur->v[j]->coord.x, cur->v[j]->coord.y, cur->v[j]->coord.z);
 					}
 				#else
 					/* Изчисляваме нормален вектор само за целия трапец */
