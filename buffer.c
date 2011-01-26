@@ -90,6 +90,7 @@ void add_point(float x, float y, float z) {
 	fill_polygon_buffer();
 }
 
+/* fill_polygon_buffer() запълва буфера за полигони с върховете им и нормалните им вектори */
 void fill_polygon_buffer() {
 	printf("Call to fill_polygon_buffer()\n");
 	size_t index;
@@ -100,6 +101,7 @@ void fill_polygon_buffer() {
 	
 	if (polygon_size == 0) /* Нямаме достатъчно точки за построяване на полигона */
 		return;
+		
 	polygon_buffer = malloc (polygon_size * sizeof(struct polygon));
 	
 	for (size_t i=0; i < buffer_size-1; i++)

@@ -80,7 +80,7 @@ void drawpolygons() {
 			
 	for (int i=0; i < polygon_size; i++) {
 			/*
-			 * Добавяме нов полигон (всъщност трапец)
+			 * Добавяме нов полигон (всъщност трапец) от буфера
 			 */
 			cur = &polygon_buffer[i];
 			
