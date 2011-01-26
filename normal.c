@@ -55,7 +55,7 @@ void vertex_normal(size_t i, size_t j) {
 	}
 	
 	cur->normal.x = sum_x/nelem;
-	cur->normal.y = sum_z/nelem;
+	cur->normal.y = sum_y/nelem;
 	cur->normal.z = sum_z/nelem;
 }
 
