@@ -40,11 +40,6 @@ void vertex_normal(size_t i, size_t j) {
 	if (i >= buffer_size || j >= no_segments)
 		return;
 		
-	if (i == 0 || j == 0) {
-		calculate_normal(&cur->coord, &cur->coord, &cur->coord, &cur->normal);
-		return;
-	}
-		
 	for (int i=0; i<4; i++) {
 		if (cur->p[i] == NULL)
 			break;
