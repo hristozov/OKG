@@ -115,6 +115,26 @@ void add_point(float x, float y, float z) {
 	}
 }
 
+/* Изчислява нормален вектор */
+void calculateNormal(struct point *start, struct point *end1, struct point *end2, struct point *normal) {  
+	struct point vector1, vector2;
+	
+	/* Първият вектор */
+	vector1.x = end1->x - start->x;
+	vector1.y = end1->y - start->y;
+	vector1.z = end1->z - start->z;
+	
+	/* Вторият вектор */
+	vector2.x = end2->x - start->x;
+	vector2.y = end2->y - start->y;
+	vector2.z = end2->z - start->z;
+	
+	/* Векторното им произведение */
+	normal->x = vector1.y*vector2.z - vector1.z*vector2.y;
+	normal->y = vector1.z*vector2.x - vector1.x*vector2.z;
+	normal->z = vector1.x*vector2.y - vector1.y*vector2.x;
+}
+
 /* ----------========== Кодът за рендване ==========---------- */
 
 /* lights() наглася източника на осветление */
@@ -157,6 +177,7 @@ void drawpolygons() {
 	if (buffer_size < 1) /* Is the buffer empty? */
 		return;
 		
+	struct point normal;
 	float model_color[] = {1, .2, .2};
 	
 	glEnable(GL_POLYGON_SMOOTH);
@@ -180,20 +201,9 @@ void drawpolygons() {
 			glBegin(GL_TRIANGLE_STRIP);
 				glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, model_color);
 				
-				/* Координати на векторите от [i][j] до [i+1][j], и от [i][j] до [i][j+1] */
-				float vector1_x = vertex_buffer[i+1][j].x - vertex_buffer[i][j].x,
-					  vector1_y = vertex_buffer[i+1][j].y - vertex_buffer[i][j].y,
-					  vector1_z = vertex_buffer[i+1][j].z - vertex_buffer[i][j].z,
-					  vector2_x = vertex_buffer[i][j+1].x - vertex_buffer[i][j].x,
-					  vector2_y = vertex_buffer[i][j+1].y - vertex_buffer[i][j].y,
-					  vector2_z = vertex_buffer[i][j+1].z - vertex_buffer[i][j].z;
-					  
-				/* Нормалният вектор на равнината на трапеца е векторното произведение на двата вече получени вектора */
-				glNormal3f(vector1_y*vector2_z - vector1_z*vector2_y,
-						   vector1_z*vector2_x - vector1_x*vector2_z,
-						   vector1_x*vector2_y - vector1_y*vector2_x);
-				
 				/* Сега вече добавяме върховете на трапеца */
+				calculateNormal(&vertex_buffer[i][j], &vertex_buffer[i+1][j], &vertex_buffer[i][j+1], &normal);
+				glNormal3f(normal.x, normal.y, normal.z);
 				glVertex3f(vertex_buffer[i][j].x,vertex_buffer[i][j].y,vertex_buffer[i][j].z);
 				glVertex3f(vertex_buffer[i+1][j].x,vertex_buffer[i+1][j].y,vertex_buffer[i+1][j].z);
 				glVertex3f(vertex_buffer[i][j+1].x,vertex_buffer[i][j+1].y,vertex_buffer[i][j+1].z);
