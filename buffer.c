@@ -94,6 +94,7 @@ void add_point(float x, float y, float z) {
 	fill_polygon_buffer();
 }
 
+/* Добавя указател към полигон в списъка с указатели на дадения връх */
 void add_polygon_ptr_to_vertex(struct polygon *p, struct vertex *v) {
 	if (p == NULL || v == NULL)
 		return;
