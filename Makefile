@@ -11,10 +11,13 @@ all: $(ALL)
 %.o: %.c
 	$(CC) $(CFLAGS) $(LDFLAGS) -c $^
 	
-project: main.c normal.c buffer.c globals.c
+project: main.c buffer.h buffer.c globals.h globals.c normal.h normal.c 
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LIBS)
 	
 valgrind: project
+	valgrind ./project
+	
+valgrind-full: project
 	valgrind --leak-check=full ./project
 
 clean:
