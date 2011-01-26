@@ -6,6 +6,8 @@
 #include <GL/glut.h>
 #include <GL/glu.h>
 
+#define SMOOTH_SHADING 1
+
 /* no_segments определя колко страни трябва да имат многоъгълниците, с които апроксимираме окръжностите около оста */
 size_t no_segments = 72;
 
@@ -135,6 +137,34 @@ void calculateNormal(struct point *start, struct point *end1, struct point *end2
 	normal->z = vector1.x*vector2.y - vector1.y*vector2.x;
 }
 
+/*
+ * Изчислява нормален вектор на даден връх като средно аритметично на нормалните вектори на полигоните, в които участва.
+ * Съседството на върховете е дадено по схемата:
+ * i+1 j-1 | i+1 j | i+1 j+1
+ * i   j-1 | i   j | i   j+1
+ * i-1 j-1 | i-1 j | i-1 j+1
+ */
+void vertexNormal(size_t i, size_t j, struct point *normal) {
+	struct point normal1, normal2, normal3, normal4;
+	
+	if (i >= buffer_size-1 || j >= buffer_size-1)
+		return;
+		
+	if (i == 0 || j == 0) {
+		calculateNormal(&vertex_buffer[i][j], &vertex_buffer[i+1][j], &vertex_buffer[i][j+1], normal);
+		return;
+	}
+		
+	calculateNormal(&vertex_buffer[i][j], &vertex_buffer[i][j-1], &vertex_buffer[i+1][j], &normal1);
+	calculateNormal(&vertex_buffer[i][j], &vertex_buffer[i+1][j], &vertex_buffer[i][j+1], &normal2);
+	calculateNormal(&vertex_buffer[i][j], &vertex_buffer[i][j+1], &vertex_buffer[i-1][j], &normal3);
+	calculateNormal(&vertex_buffer[i][j], &vertex_buffer[i][j-1], &vertex_buffer[i-1][j], &normal4);
+	
+	normal->x = (normal1.x + normal2.x + normal3.x + normal4.x) * .25f;
+	normal->y = (normal1.y + normal2.y + normal3.y + normal4.y) * .25f;
+	normal->z = (normal1.z + normal2.z + normal3.z + normal4.z) * .25f;
+}
+
 /* ----------========== Кодът за рендване ==========---------- */
 
 /* lights() наглася източника на осветление */
@@ -183,7 +213,11 @@ void drawpolygons() {
 	glEnable(GL_POLYGON_SMOOTH);
 	glEnable(GL_LINE_SMOOTH);
 	
-	glShadeModel(GL_SMOOTH);
+	#ifdef SMOOTH_SHADING
+		glShadeModel(GL_SMOOTH);
+	#else
+		glShadeModel(GL_FLAT);
+	#endif
 	
 	glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER,1);
 	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE,0);
@@ -202,12 +236,27 @@ void drawpolygons() {
 				glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, model_color);
 				
 				/* Сега вече добавяме върховете на трапеца */
-				calculateNormal(&vertex_buffer[i][j], &vertex_buffer[i+1][j], &vertex_buffer[i][j+1], &normal);
-				glNormal3f(normal.x, normal.y, normal.z);
-				glVertex3f(vertex_buffer[i][j].x,vertex_buffer[i][j].y,vertex_buffer[i][j].z);
-				glVertex3f(vertex_buffer[i+1][j].x,vertex_buffer[i+1][j].y,vertex_buffer[i+1][j].z);
-				glVertex3f(vertex_buffer[i][j+1].x,vertex_buffer[i][j+1].y,vertex_buffer[i][j+1].z);
-				glVertex3f(vertex_buffer[i+1][j+1].x,vertex_buffer[i+1][j+1].y,vertex_buffer[i+1][j+1].z);
+				#ifdef SMOOTH_SHADING
+					vertexNormal(i, j, &normal);
+					glNormal3f(normal.x, normal.y, normal.z);
+					glVertex3f(vertex_buffer[i][j].x, vertex_buffer[i][j].y, vertex_buffer[i][j].z);
+					vertexNormal(i+1, j, &normal);
+					glNormal3f(normal.x, normal.y, normal.z);
+					glVertex3f(vertex_buffer[i+1][j].x, vertex_buffer[i+1][j].y, vertex_buffer[i+1][j].z);
+					vertexNormal(i, j+1, &normal);
+					glNormal3f(normal.x, normal.y, normal.z);
+					glVertex3f(vertex_buffer[i][j+1].x, vertex_buffer[i][j+1].y, vertex_buffer[i][j+1].z);
+					vertexNormal(i+1, j+1, &normal);
+					glNormal3f(normal.x, normal.y, normal.z);
+					glVertex3f(vertex_buffer[i+1][j+1].x, vertex_buffer[i+1][j+1].y, vertex_buffer[i+1][j+1].z);
+				#else
+					calculateNormal(&vertex_buffer[i][j], &vertex_buffer[i+1][j], &vertex_buffer[i][j+1], &normal);
+					glNormal3f(normal.x, normal.y, normal.z);
+					glVertex3f(vertex_buffer[i][j].x, vertex_buffer[i][j].y, vertex_buffer[i][j].z);
+					glVertex3f(vertex_buffer[i+1][j].x, vertex_buffer[i+1][j].y, vertex_buffer[i+1][j].z);
+					glVertex3f(vertex_buffer[i][j+1].x, vertex_buffer[i][j+1].y, vertex_buffer[i][j+1].z);
+					glVertex3f(vertex_buffer[i+1][j+1].x, vertex_buffer[i+1][j+1].y, vertex_buffer[i+1][j+1].z);
+				#endif
 			glEnd();
 		}
 }
