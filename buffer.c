@@ -102,8 +102,8 @@ void fill_polygon_buffer() {
 		return;
 	polygon_buffer = malloc (polygon_size * sizeof(struct polygon));
 	
-	for (int i=0; i < buffer_size-1; i++)
-		for (int j=0; j < no_segments-1; j++) {
+	for (size_t i=0; i < buffer_size-1; i++)
+		for (size_t j=0; j < no_segments-1; j++) {
 			index = i*(no_segments-1) + j;
 			polygon_buffer[index].p[0] = &vertex_buffer[i][j];
 			polygon_buffer[index].p[1] = &vertex_buffer[i+1][j];
