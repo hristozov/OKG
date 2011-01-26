@@ -96,6 +96,7 @@ void add_point(float x, float y, float z) {
 void fill_polygon_buffer() {
 	printf("Call to fill_polygon_buffer()\n");
 	size_t index;
+	struct polygon *cur;
 	if (polygon_buffer != NULL)
 		free (polygon_buffer);
 		
@@ -109,10 +110,11 @@ void fill_polygon_buffer() {
 	for (size_t i=0; i < buffer_size-1; i++)
 		for (size_t j=0; j < no_segments-1; j++) {
 			index = i*(no_segments-1) + j;
-			polygon_buffer[index].p[0] = &vertex_buffer[i][j];
-			polygon_buffer[index].p[1] = &vertex_buffer[i+1][j];
-			polygon_buffer[index].p[2] = &vertex_buffer[i][j+1];
-			polygon_buffer[index].p[3] = &vertex_buffer[i+1][j+1];
-			calculateNormal(&polygon_buffer[index].p[0]->coord, &polygon_buffer[index].p[1]->coord, &polygon_buffer[index].p[2]->coord, &polygon_buffer[index].normal);
+			cur = &polygon_buffer[index];
+			cur->p[0] = &vertex_buffer[i][j];
+			cur->p[1] = &vertex_buffer[i+1][j];
+			cur->p[2] = &vertex_buffer[i][j+1];
+			cur->p[3] = &vertex_buffer[i+1][j+1];
+			calculateNormal(&cur->p[0]->coord, &cur->p[1]->coord, &cur->p[2]->coord, &cur->normal);
 		}
 }
