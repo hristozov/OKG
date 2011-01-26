@@ -14,6 +14,7 @@
 /* Градусите за ротиране на "слънцето" */
 int alpha_degrees = 0;
 
+void lights();
 void drawpolygons();
 void mouse(int, int, int, int);
 void reshape(int, int);
