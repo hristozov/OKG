@@ -154,7 +154,7 @@ void rotateSun(int foo) {
 
 /* Рендване на сцената */
 void render() {
-	printf("Call to render() with %lu points\n", buffer_size);
+	/* printf("Call to render() with %lu points\n", buffer_size); */
 	glViewport(0, 0, VIEWPORT_BORDER, g_y);
 	
 	glClearColor(0.f,0.f,0.f,0.f);
