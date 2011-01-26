@@ -37,7 +37,7 @@ void vertex_normal(size_t i, size_t j) {
 	float len = 0.f;
 	
 	/* Невалидни стойности за размера на буфера */
-	if (i >= buffer_size-1 || j >= buffer_size-1)
+	if (i >= buffer_size || j >= no_segments)
 		return;
 		
 	if (i == 0 || j == 0) {
