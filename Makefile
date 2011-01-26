@@ -12,7 +12,7 @@ all: $(ALL)
 	$(CC) $(CFLAGS) $(LDFLAGS) -c $^
 	
 project: main.c buffer.h buffer.c globals.h globals.c normal.h normal.c 
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ main.c buffer.c globals.c normal.c $(LIBS)
 	
 valgrind: project
 	valgrind ./project
