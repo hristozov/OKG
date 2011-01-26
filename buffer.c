@@ -38,6 +38,8 @@ void vertex_buffer_resize(size_t new_size) {
 		for (size_t i = buffer_size; i < new_size; i++) {
 			if ((vertex_buffer[i] = (struct vertex*) calloc(no_segments, sizeof(struct vertex))) == NULL)
 				exit(-1);
+			for (size_t j=0; j < no_segments; j++)
+				vertex_buffer[i][j].p[0] = vertex_buffer[i][j].p[1] = vertex_buffer[i][j].p[2] = vertex_buffer[i][j].p[3] = NULL;
 		}
 		
 		buffer_size = new_size;
