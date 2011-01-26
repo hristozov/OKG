@@ -86,7 +86,9 @@ void add_point(float x, float y, float z) {
 		//printf("POINT: %f %f %f DISTANCE FROM 0: %f\n", vertex_buffer[cur_index][i].x, vertex_buffer[cur_index][i].y, vertex_buffer[cur_index][i].z, sqrtf(vertex_buffer[cur_index][i].x*vertex_buffer[cur_index][i].x + vertex_buffer[cur_index][i].y*vertex_buffer[cur_index][i].y + vertex_buffer[cur_index][i].z*vertex_buffer[cur_index][i].z));
 	}
 	
-	calculateVertexNormals();
+	#ifdef SMOOTH_SHADING
+		calculateVertexNormals();
+	#endif
 	fill_polygon_buffer();
 }
 

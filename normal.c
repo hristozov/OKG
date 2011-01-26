@@ -23,6 +23,8 @@ void calculateNormal(struct point *start, struct point *end1, struct point *end2
 	normal->z = vector1.x*vector2.y - vector1.y*vector2.x;
 }
 
+#ifdef SMOOTH_SHADING
+
 /*
  * Изчислява нормален вектор на даден връх като средно аритметично на нормалните вектори на полигоните, в които участва.
  * Съседството на върховете е дадено по схемата:
@@ -61,3 +63,5 @@ void calculateVertexNormals() {
 		for (int j=0; j < no_segments; j++)
 			vertexNormal(i, j);
 }
+
+#endif
