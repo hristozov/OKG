@@ -104,14 +104,7 @@ void fill_polygon_buffer() {
 	
 	for (int i=0; i < buffer_size-1; i++)
 		for (int j=0; j < no_segments-1; j++) {
-			//index = i+j*i;
-			//index = j*(i+1) + j;
 			index = i*(no_segments-1) + j;
-			//printf("i=%d j=%d index=%lu buf_size=%d pol_size=%lu\n", i, j, index, buffer_size, polygon_size);
-			if (index >= polygon_size) {
-				printf("WTF? %lu %lu", index, polygon_size);
-				exit(-1);
-			}
 			polygon_buffer[index].p[0] = &vertex_buffer[i][j];
 			polygon_buffer[index].p[1] = &vertex_buffer[i+1][j];
 			polygon_buffer[index].p[2] = &vertex_buffer[i][j+1];
