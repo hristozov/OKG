@@ -61,6 +61,8 @@ void drawpolygons() {
 	if (buffer_size < 1) /* Празен ли е буферът? */
 		return;
 		
+	struct polygon *cur;
+		
 	#ifndef SMOOTH_SHADING
 		struct point normal;
 	#endif
@@ -80,45 +82,31 @@ void drawpolygons() {
 	glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER,1);
 	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE,0);
 			
-	for (int i=0; i < buffer_size-1; i++)
-		for (int j=0; j < no_segments-1; j++) {
+	for (int i=0; i < polygon_size; i++) {
 			/*
-			 * Добавяме нов полигон (всъщност трапец) чрез следните 4 точки:
-			 * vertex_buffer[i][j];
-			 * vertex_buffer[i][j+1];
-			 * vertex_buffer[i+1][j];
-			 * vertex_buffer[i+1][j+1];
-			 * Забележка: Функциите glBegin(), glColor3f() и glEnd() могат да бъдат извадени извън цикъла при използване на GL_QUADS
+			 * Добавяме нов полигон (всъщност трапец)
 			 */
+			cur = &polygon_buffer[i];
+			
 			glBegin(GL_TRIANGLE_STRIP);
 				glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, model_color);
 				
 				/* Сега вече добавяме върховете на трапеца */
 				#ifdef SMOOTH_SHADING
-					/* В този случай изчисляваме нормален вектор за всеки връх и викаме glNormal3f преди всеки glVertex3f */
-					glNormal3f(vertex_buffer[i][j].normal->x, vertex_buffer[i][j].normal->y, vertex_buffer[i][j].normal->z);
-					glVertex3f(vertex_buffer[i][j].coord->x, vertex_buffer[i][j].coord->y, vertex_buffer[i][j].coord->z);
-					
-					glNormal3f(vertex_buffer[i+1][j].normal->x, vertex_buffer[i+1][j].normal->y, vertex_buffer[i+1][j].normal->z);
-					glVertex3f(vertex_buffer[i+1][j].coord->x, vertex_buffer[i+1][j].coord->y, vertex_buffer[i+1][j].coord->z);
-					
-					glNormal3f(vertex_buffer[i][j+1].normal->x, vertex_buffer[i][j+1].normal->y, vertex_buffer[i][j+1].normal->z);
-					glVertex3f(vertex_buffer[i][j+1].coord->x, vertex_buffer[i][j+1].coord->y, vertex_buffer[i][j+1].coord->z);
-					
-					glNormal3f(vertex_buffer[i+1][j+1].normal->x, vertex_buffer[i+1][j+1].normal->y, vertex_buffer[i+1][j+1].normal->z);
-					glVertex3f(vertex_buffer[i+1][j+1].coord->x, vertex_buffer[i+1][j+1].coord->y, vertex_buffer[i+1][j+1].coord->z);
+					/* В този случай викаме glNormal3f преди всеки glVertex3f */
+					for (int j=0; j < 4; j++) {
+						glNormal3f(cur->p[j]->normal.x, cur->p[j]->normal.y, cur->p[j]->normal.z);
+						glVertex3f(cur->p[j]->coord.x, cur->p[j]->coord.y, cur->p[j]->coord.z);
+					}
 				#else
 					/* Изчисляваме нормален вектор само за целия трапец */
-					calculateNormal(vertex_buffer[i][j].coord, vertex_buffer[i+1][j].coord, vertex_buffer[i][j+1].coord, &normal);
-					glNormal3f(normal.x, normal.y, normal.z);
+					glNormal3f(cur->normal.x, cur->normal.y, normal.z);
 					
-					glVertex3f(vertex_buffer[i][j].coord->x, vertex_buffer[i][j].coord->y, vertex_buffer[i][j].coord->z);
-					glVertex3f(vertex_buffer[i+1][j].coord->x, vertex_buffer[i+1][j].coord->y, vertex_buffer[i+1][j].coord->z);
-					glVertex3f(vertex_buffer[i][j+1].coord->x, vertex_buffer[i][j+1].coord->y, vertex_buffer[i][j+1].coord->z);
-					glVertex3f(vertex_buffer[i+1][j+1].coord->x, vertex_buffer[i+1][j+1].coord->y, vertex_buffer[i+1][j+1].coord->z);
+					for (int j=0; j < 4; j++)
+						glVertex3f(cur->p[j]->coord.x, cur->p[j]->coord.y, cur->p[j]->coord.z);
 				#endif
 			glEnd();
-		}
+	}
 }
 
 /* drawmodel() рисува ротационното тяло */

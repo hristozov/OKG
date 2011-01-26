@@ -31,10 +31,18 @@ struct point {
 };
 
 struct vertex {
-	struct point *coord;
-	struct point *normal;
+	struct point coord;
+	struct point normal;
+};
+
+struct polygon {
+	struct vertex *p[4];
+	struct point normal;
 };
 
 /* Глобалният буфер, в който съхраняваме всички vertex-и */
 extern size_t buffer_size;
 extern struct vertex **vertex_buffer;
+
+extern size_t polygon_size;
+extern struct polygon *polygon_buffer;

@@ -7,10 +7,13 @@
 void buffer_init() {
 	buffer_size = 0;
 	vertex_buffer = NULL;
+	
+	polygon_size = 0;
+	polygon_buffer = NULL;
 }
 
 /* Преоразмеряване на vertex буфера */
-void buffer_resize(size_t new_size) {
+void vertex_buffer_resize(size_t new_size) {
 	printf("buffer_resize() - old size: %lu new size: %lu\n", buffer_size, new_size);
 	if (new_size == 0) {
 		buffer_kill();
@@ -19,10 +22,6 @@ void buffer_resize(size_t new_size) {
 	
 	if (new_size < buffer_size) {
 		for (size_t i = buffer_size; i > new_size; i--) {
-			for (int j=0; j < no_segments; j++) {
-				free(vertex_buffer[i-1][j].coord);
-				free(vertex_buffer[i-1][j].normal);
-			}
 			free(vertex_buffer[i-1]);
 		}
 			
@@ -39,14 +38,6 @@ void buffer_resize(size_t new_size) {
 		for (size_t i = buffer_size; i < new_size; i++) {
 			if ((vertex_buffer[i] = (struct vertex*) calloc(no_segments, sizeof(struct vertex))) == NULL)
 				exit(-1);
-				
-			for (int j=0; j < no_segments; j++) {
-				if ((vertex_buffer[i][j].coord = (struct point*) malloc(sizeof(struct point))) == NULL)
-					exit (-1);
-				if ((vertex_buffer[i][j].normal = (struct point*) malloc(sizeof(struct point))) == NULL)
-					exit (-1);
-				vertex_buffer[i][j].normal->x = vertex_buffer[i][j].normal->y = vertex_buffer[i][j].normal->z = 0;
-			}
 		}
 		
 		buffer_size = new_size;
@@ -56,15 +47,14 @@ void buffer_resize(size_t new_size) {
 /* Освобождаване на паметта */
 void buffer_kill() {
 	for (int i=0; i < buffer_size; i++) {
-		for (int j=0; j < no_segments; j++) {
-			free(vertex_buffer[i][j].coord);
-			free(vertex_buffer[i][j].normal);
-		}
 		free(vertex_buffer[i]);
 	}
 	free(vertex_buffer);
 	vertex_buffer = NULL;
 	buffer_size = 0;
+	
+	free(polygon_buffer);
+	polygon_size = 0;
 }
 
 /* 
@@ -74,7 +64,7 @@ void buffer_kill() {
  */
 void add_point(float x, float y, float z) {
 	size_t cur_index = buffer_size;
-	buffer_resize(buffer_size + 1);
+	vertex_buffer_resize(buffer_size + 1);
 	
 	printf("Adding point %lu (%f %f %f)\n", cur_index, x, y, z);
 	
@@ -89,12 +79,43 @@ void add_point(float x, float y, float z) {
 		 * Изчисляваме координатите на текущата точка
 		 * Променяме само x и z, защото апроксимираме фигура около оста с координати (0, y, 0)
 		 */
-		vertex_buffer[cur_index][i].coord->x = r * cosf(angle);
-		vertex_buffer[cur_index][i].coord->y = y;
-		vertex_buffer[cur_index][i].coord->z = r * sinf(angle);
+		vertex_buffer[cur_index][i].coord.x = r * cosf(angle);
+		vertex_buffer[cur_index][i].coord.y = y;
+		vertex_buffer[cur_index][i].coord.z = r * sinf(angle);
 		
 		//printf("POINT: %f %f %f DISTANCE FROM 0: %f\n", vertex_buffer[cur_index][i].x, vertex_buffer[cur_index][i].y, vertex_buffer[cur_index][i].z, sqrtf(vertex_buffer[cur_index][i].x*vertex_buffer[cur_index][i].x + vertex_buffer[cur_index][i].y*vertex_buffer[cur_index][i].y + vertex_buffer[cur_index][i].z*vertex_buffer[cur_index][i].z));
 	}
 	
 	calculateVertexNormals();
+	fill_polygon_buffer();
+}
+
+void fill_polygon_buffer() {
+	printf("Call to fill_polygon_buffer()\n");
+	size_t index;
+	if (polygon_buffer != NULL)
+		free (polygon_buffer);
+		
+	polygon_size = (buffer_size-1) * (no_segments-1);
+	
+	if (polygon_size == 0) /* Нямаме достатъчно точки за построяване на полигона */
+		return;
+	polygon_buffer = malloc (polygon_size * sizeof(struct polygon));
+	
+	for (int i=0; i < buffer_size-1; i++)
+		for (int j=0; j < no_segments-1; j++) {
+			//index = i+j*i;
+			//index = j*(i+1) + j;
+			index = i*(no_segments-1) + j;
+			//printf("i=%d j=%d index=%lu buf_size=%d pol_size=%lu\n", i, j, index, buffer_size, polygon_size);
+			if (index >= polygon_size) {
+				printf("WTF? %lu %lu", index, polygon_size);
+				exit(-1);
+			}
+			polygon_buffer[index].p[0] = &vertex_buffer[i][j];
+			polygon_buffer[index].p[1] = &vertex_buffer[i+1][j];
+			polygon_buffer[index].p[2] = &vertex_buffer[i][j+1];
+			polygon_buffer[index].p[3] = &vertex_buffer[i+1][j+1];
+			calculateNormal(&polygon_buffer[index].p[0]->coord, &polygon_buffer[index].p[1]->coord, &polygon_buffer[index].p[2]->coord, &polygon_buffer[index].normal);
+		}
 }

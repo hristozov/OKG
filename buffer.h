@@ -9,3 +9,4 @@ void buffer_init();
 void buffer_resize(size_t);
 void buffer_kill();
 void add_point(float, float, float);
+void fill_polygon_buffer();
