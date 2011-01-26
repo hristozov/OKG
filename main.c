@@ -22,6 +22,10 @@ int g_y = 600;
 #define PROJECT_INTERVAL_X 10.f
 #define PROJECT_INTERVAL_Y 10.f
 
+/* Целта на по-долните макроси е да проектира координатите (x,y) в интервали, избрани с PROJECT_INTERVAL_* */
+#define PROJECT_IN_X(x) ((float)(((x)-(g_x/VIEWPORT_FACTOR))*(PROJECT_INTERVAL_X/(g_x-g_x/VIEWPORT_FACTOR))))
+#define PROJECT_IN_Y(y) (PROJECT_INTERVAL_Y - (float)((y)*(PROJECT_INTERVAL_Y/g_y)))
+
 /* Градусите за ротиране на "слънцето" */
 int alpha_degrees = 0;
 
@@ -153,9 +157,8 @@ void mouse (int button, int state, int mx, int my) {
 			return;
 		}
 		
-		/* Целта на по-долния код е да проектира координатите (mx,my) в x и y, които са в интервали, избрани с PROJECT_INTERVAL_* */
-		float x = (float)((mx-(g_x/VIEWPORT_FACTOR))*(PROJECT_INTERVAL_X/(g_x-g_x/VIEWPORT_FACTOR)));
-		float y = PROJECT_INTERVAL_Y - (float)(my*(PROJECT_INTERVAL_Y/g_y));
+		float x = PROJECT_IN_X(mx);
+		float y = PROJECT_IN_Y(my);
 		
 		printf("Adding point %f %f %f (converted from %d %d %d)\n", x, y, 0.f, mx, my, 0);
 		add_point(x, y, 0);
