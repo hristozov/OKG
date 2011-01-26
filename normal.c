@@ -1,8 +1,6 @@
 #include "buffer.h"
 #include "normal.h"
 
-//extern size_t no_segments;
-
 /* Изчислява нормален вектор */
 void calculateNormal(struct point *start, struct point *end1, struct point *end2, struct point *normal) {  
 	struct point vector1, vector2;
