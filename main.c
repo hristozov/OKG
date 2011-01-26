@@ -26,7 +26,7 @@ void lights() {
 	static float orange[] = {.4f, .3f, .1f, 1.f};
 
 	static float black[] = {.0f, .0f, .0f, 1.f};
-	static float white[] = {1.f, 1.f, 1.f, 1.f};
+	/* static float white[] = {1.f, 1.f, 1.f, 1.f}; */
 	static float yellow[] = {.99f, .8f, .0f, 1.f};
 
 	static float pos[] = {0.f, 0.f, 0.f, 1.f};
