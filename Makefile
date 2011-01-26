@@ -11,7 +11,7 @@ all: $(ALL)
 %.o: %.c
 	$(CC) $(CFLAGS) $(LDFLAGS) -c $^
 	
-project: main.c
+project: main.c normal.c buffer.c globals.c
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LIBS)
 	
 valgrind: project
