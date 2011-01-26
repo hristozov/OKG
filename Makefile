@@ -21,4 +21,4 @@ valgrind-full: project
 	valgrind --leak-check=full ./project
 
 clean:
-	rm -f a.out *.o *~ $(ALL) *.tar.bz2 *.tar.gz Z*
+	rm -f a.out *.o $(ALL)
