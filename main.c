@@ -20,8 +20,6 @@ void mouse(int, int, int, int);
 void reshape(int, int);
 void render();
 
-/* ----------========== Кодът за рендване ==========---------- */
-
 /* lights() наглася източника на осветление */
 void lights() {
 	static float near_white[] = {.45f, .45f, .5f, 1.f};
