@@ -1,7 +1,7 @@
 SHELL	= /bin/sh
 
 CC	= gcc
-CFLAGS	= -pipe -g -Wall -std=c99 -D_GNU_SOURCE 
+CFLAGS	= -pipe -g -Wall -std=c99 -D_GNU_SOURCE
 LDFLAGS	= -lm -lGLU -lglut
 
 ALL = project
