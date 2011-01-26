@@ -105,6 +105,7 @@ void add_polygon_ptr_to_vertex(struct polygon *p, struct vertex *v) {
 			continue;
 		}
 		v->p[i] = p;
+		return;
 	}
 }
 
