@@ -6,7 +6,7 @@
 #include <GL/glut.h>
 #include <GL/glu.h>
 
-//#define SMOOTH_SHADING 1
+#define SMOOTH_SHADING 1
 
 /* no_segments определя колко страни трябва да имат многоъгълниците, с които апроксимираме окръжностите около оста */
 size_t no_segments = 72;
@@ -42,6 +42,9 @@ void buffer_init();
 void buffer_resize(size_t);
 void buffer_kill();
 void add_point(float, float, float);
+void calculateNormal(struct point*, struct point*, struct point*, struct point*);
+void vertexNormal(size_t, size_t);
+void calculateVertexNormals();
 void drawpolygons();
 void mouse(int, int, int, int);
 void reshape(int, int);
@@ -89,6 +92,7 @@ void buffer_resize(size_t new_size) {
 					exit (-1);
 				if ((vertex_buffer[i][j].normal = (struct point*) malloc(sizeof(struct point))) == NULL)
 					exit (-1);
+				vertex_buffer[i][j].normal->x = vertex_buffer[i][j].normal->y = vertex_buffer[i][j].normal->z = 0;
 			}
 		}
 		
@@ -138,6 +142,8 @@ void add_point(float x, float y, float z) {
 		
 		//printf("POINT: %f %f %f DISTANCE FROM 0: %f\n", vertex_buffer[cur_index][i].x, vertex_buffer[cur_index][i].y, vertex_buffer[cur_index][i].z, sqrtf(vertex_buffer[cur_index][i].x*vertex_buffer[cur_index][i].x + vertex_buffer[cur_index][i].y*vertex_buffer[cur_index][i].y + vertex_buffer[cur_index][i].z*vertex_buffer[cur_index][i].z));
 	}
+	
+	calculateVertexNormals();
 }
 
 /* Изчислява нормален вектор */
@@ -167,14 +173,14 @@ void calculateNormal(struct point *start, struct point *end1, struct point *end2
  * i   j-1 | i   j | i   j+1
  * i-1 j-1 | i-1 j | i-1 j+1
  */
-void vertexNormal(size_t i, size_t j, struct point *normal) {
+void vertexNormal(size_t i, size_t j) {
 	struct point normal1, normal2, normal3, normal4;
 	
 	if (i >= buffer_size-1 || j >= buffer_size-1)
 		return;
 		
 	if (i == 0 || j == 0) {
-		calculateNormal(vertex_buffer[i][j].coord, vertex_buffer[i+1][j].coord, vertex_buffer[i][j+1].coord, normal);
+		calculateNormal(vertex_buffer[i][j].coord, vertex_buffer[i+1][j].coord, vertex_buffer[i][j+1].coord, vertex_buffer[i][j].normal);
 		return;
 	}
 		
@@ -183,9 +189,16 @@ void vertexNormal(size_t i, size_t j, struct point *normal) {
 	calculateNormal(vertex_buffer[i][j].coord, vertex_buffer[i][j+1].coord, vertex_buffer[i-1][j].coord, &normal3);
 	calculateNormal(vertex_buffer[i][j].coord, vertex_buffer[i][j-1].coord, vertex_buffer[i-1][j].coord, &normal4);
 	
-	normal->x = (normal1.x + normal2.x + normal3.x + normal4.x) * .25f;
-	normal->y = (normal1.y + normal2.y + normal3.y + normal4.y) * .25f;
-	normal->z = (normal1.z + normal2.z + normal3.z + normal4.z) * .25f;
+	vertex_buffer[i][j].normal->x = (normal1.x + normal2.x + normal3.x + normal4.x) * .25f;
+	vertex_buffer[i][j].normal->y = (normal1.y + normal2.y + normal3.y + normal4.y) * .25f;
+	vertex_buffer[i][j].normal->z = (normal1.z + normal2.z + normal3.z + normal4.z) * .25f;
+}
+
+void calculateVertexNormals() {
+	printf("Calculating vertex normals...");
+	for (int i=0; i < buffer_size; i++)
+		for (int j=0; j < buffer_size; j++)
+			vertexNormal(i, j);
 }
 
 /* ----------========== Кодът за рендване ==========---------- */
@@ -230,7 +243,10 @@ void drawpolygons() {
 	if (buffer_size < 1) /* Is the buffer empty? */
 		return;
 		
-	struct point normal;
+	#ifndef SMOOTH_SHADING
+		struct point normal;
+	#endif
+	
 	float model_color[] = {1, .2, .2};
 	
 	glEnable(GL_POLYGON_SMOOTH);
@@ -261,20 +277,16 @@ void drawpolygons() {
 				/* Сега вече добавяме върховете на трапеца */
 				#ifdef SMOOTH_SHADING
 					/* В този случай изчисляваме нормален вектор за всеки връх и викаме glNormal3f преди всеки glVertex3f */
-					vertexNormal(i, j, &normal);
-					glNormal3f(normal.x, normal.y, normal.z);
+					glNormal3f(vertex_buffer[i][j].normal->x, vertex_buffer[i][j].normal->y, vertex_buffer[i][j].normal->z);
 					glVertex3f(vertex_buffer[i][j].coord->x, vertex_buffer[i][j].coord->y, vertex_buffer[i][j].coord->z);
 					
-					vertexNormal(i+1, j, &normal);
-					glNormal3f(normal.x, normal.y, normal.z);
+					glNormal3f(vertex_buffer[i+1][j].normal->x, vertex_buffer[i+1][j].normal->y, vertex_buffer[i+1][j].normal->z);
 					glVertex3f(vertex_buffer[i+1][j].coord->x, vertex_buffer[i+1][j].coord->y, vertex_buffer[i+1][j].coord->z);
 					
-					vertexNormal(i, j+1, &normal);
-					glNormal3f(normal.x, normal.y, normal.z);
+					glNormal3f(vertex_buffer[i][j+1].normal->x, vertex_buffer[i][j+1].normal->y, vertex_buffer[i][j+1].normal->z);
 					glVertex3f(vertex_buffer[i][j+1].coord->x, vertex_buffer[i][j+1].coord->y, vertex_buffer[i][j+1].coord->z);
 					
-					vertexNormal(i+1, j+1, &normal);
-					glNormal3f(normal.x, normal.y, normal.z);
+					glNormal3f(vertex_buffer[i+1][j+1].normal->x, vertex_buffer[i+1][j+1].normal->y, vertex_buffer[i+1][j+1].normal->z);
 					glVertex3f(vertex_buffer[i+1][j+1].coord->x, vertex_buffer[i+1][j+1].coord->y, vertex_buffer[i+1][j+1].coord->z);
 				#else
 					/* Изчисляваме нормален вектор само за целия трапец */
