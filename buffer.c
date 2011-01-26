@@ -89,7 +89,7 @@ void add_point(float x, float y, float z) {
 	}
 	
 	#ifdef SMOOTH_SHADING
-		calculateVertexNormals();
+		calculate_vertex_normals();
 	#endif
 	fill_polygon_buffer();
 }
