@@ -9,8 +9,6 @@
 #include "globals.h"
 #include "normal.h"
 
-#define SMOOTH_SHADING 1
-
 /* Градусите за ротиране на "слънцето" */
 int alpha_degrees = 0;
 

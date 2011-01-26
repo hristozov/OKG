@@ -1,6 +1,8 @@
 #pragma once
 #include <stdlib.h> /* size_t */
 
+#define SMOOTH_SHADING 1
+
 /* g_x и g_y регулират размера на прозореца */
 extern int g_x;
 extern int g_y;
