@@ -15,6 +15,9 @@ extern int g_y;
 #define IS_IN_LEFT_VIEWPORT(x) ((x) < VIEWPORT_BORDER ? 1 : 0)
 #define IS_IN_RIGHT_VIEWPORT(x) ((x) < VIEWPORT_BORDER ? 0 : 1)
 
+/* Дължина на вектор, ползва се предимно за debug */
+#define VECTOR_LENGTH(pt) ((sqrtf ((pt).x*(pt).x + (pt).y*(pt).y + (pt).z*(pt).z)))
+
 /* Големина на числовия интервал, в който да се проектират точките, избрани с мишката */
 #define PROJECT_INTERVAL_X 10.f
 #define PROJECT_INTERVAL_Y 10.f
