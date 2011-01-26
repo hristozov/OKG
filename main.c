@@ -1,15 +1,15 @@
 /* gcc -pipe -g -Wall -std=c99 -D_GNU_SOURCE  -lm -lGLU -lglut -o project main.c */
 #include <math.h>
 #include <stdio.h>
-#include <stdlib.h>
 
 #include <GL/glut.h>
 #include <GL/glu.h>
 
-#define SMOOTH_SHADING 1
+#include "buffer.h"
+#include "globals.h"
+#include "normal.h"
 
-/* no_segments определя колко страни трябва да имат многоъгълниците, с които апроксимираме окръжностите около оста */
-size_t no_segments = 72;
+#define SMOOTH_SHADING 1
 
 /* g_x и g_y регулират размера на прозореца */
 int g_x = 800;
@@ -22,184 +22,13 @@ int g_y = 600;
 #define PROJECT_INTERVAL_X 10.f
 #define PROJECT_INTERVAL_Y 10.f
 
-struct point {
-	float x,y,z;
-};
-
-struct vertex {
-	struct point *coord;
-	struct point *normal;
-};
-
-/* Глобалният буфер, в който съхраняваме всички vertex-и */
-size_t buffer_size;
-struct vertex **vertex_buffer;
-
 /* Градусите за ротиране на "слънцето" */
 int alpha_degrees = 0;
 
-void buffer_init();
-void buffer_resize(size_t);
-void buffer_kill();
-void add_point(float, float, float);
-void calculateNormal(struct point*, struct point*, struct point*, struct point*);
-void vertexNormal(size_t, size_t);
-void calculateVertexNormals();
 void drawpolygons();
 void mouse(int, int, int, int);
 void reshape(int, int);
 void render();
-
-/* Инициализация на vertex буфера */
-void buffer_init() {
-	buffer_size = 0;
-	vertex_buffer = NULL;
-}
-
-/* Преоразмеряване на vertex буфера */
-void buffer_resize(size_t new_size) {
-	printf("buffer_resize() - old size: %lu new size: %lu\n", buffer_size, new_size);
-	if (new_size == 0) {
-		buffer_kill();
-		return;
-	}
-	
-	if (new_size < buffer_size) {
-		for (size_t i = buffer_size; i > new_size; i--) {
-			for (int j=0; j < no_segments; j++) {
-				free(vertex_buffer[i-1][j].coord);
-				free(vertex_buffer[i-1][j].normal);
-			}
-			free(vertex_buffer[i-1]);
-		}
-			
-		if ((vertex_buffer = (struct vertex**) realloc(vertex_buffer, new_size * sizeof(struct vertex*))) == NULL)
-			exit(-1);
-			
-		buffer_size = new_size;
-	}
-	
-	if (new_size > buffer_size) {
-		if ((vertex_buffer = (struct vertex**) realloc(vertex_buffer, new_size * sizeof(struct vertex*))) == NULL)
-			exit(-1);
-		
-		for (size_t i = buffer_size; i < new_size; i++) {
-			if ((vertex_buffer[i] = (struct vertex*) calloc(no_segments, sizeof(struct vertex))) == NULL)
-				exit(-1);
-				
-			for (int j=0; j < no_segments; j++) {
-				if ((vertex_buffer[i][j].coord = (struct point*) malloc(sizeof(struct point))) == NULL)
-					exit (-1);
-				if ((vertex_buffer[i][j].normal = (struct point*) malloc(sizeof(struct point))) == NULL)
-					exit (-1);
-				vertex_buffer[i][j].normal->x = vertex_buffer[i][j].normal->y = vertex_buffer[i][j].normal->z = 0;
-			}
-		}
-		
-		buffer_size = new_size;
-	}
-}
-
-/* Освобождаване на паметта */
-void buffer_kill() {
-	for (int i=0; i < buffer_size; i++) {
-		for (int j=0; j < no_segments; j++) {
-			free(vertex_buffer[i][j].coord);
-			free(vertex_buffer[i][j].normal);
-		}
-		free(vertex_buffer[i]);
-	}
-	free(vertex_buffer);
-	vertex_buffer = NULL;
-	buffer_size = 0;
-}
-
-/* 
- * Функцията add_point взима за аргумент контролна точка от образуващата
- * След това тя изчислява и записва точки, които чрез правилен многоъгълник апроксимират окръжност около оста на ротация
- * Оста има координати (0, y, 0)
- */
-void add_point(float x, float y, float z) {
-	size_t cur_index = buffer_size;
-	buffer_resize(buffer_size + 1);
-	
-	printf("Adding point %lu (%f %f %f)\n", cur_index, x, y, z);
-	
-	/* Разстоянието от оста */
-	float r = sqrtf(x*x + z*z);
-	
-	for (size_t i = 0; i < no_segments; i++) {
-		/* Ъгълът на текущия сегмент */
-		float angle = (2.0f * M_PI * (float)i) / (float)no_segments;
-		
-		/* 
-		 * Изчисляваме координатите на текущата точка
-		 * Променяме само x и z, защото апроксимираме фигура около оста с координати (0, y, 0)
-		 */
-		vertex_buffer[cur_index][i].coord->x = r * cosf(angle);
-		vertex_buffer[cur_index][i].coord->y = y;
-		vertex_buffer[cur_index][i].coord->z = r * sinf(angle);
-		
-		//printf("POINT: %f %f %f DISTANCE FROM 0: %f\n", vertex_buffer[cur_index][i].x, vertex_buffer[cur_index][i].y, vertex_buffer[cur_index][i].z, sqrtf(vertex_buffer[cur_index][i].x*vertex_buffer[cur_index][i].x + vertex_buffer[cur_index][i].y*vertex_buffer[cur_index][i].y + vertex_buffer[cur_index][i].z*vertex_buffer[cur_index][i].z));
-	}
-	
-	calculateVertexNormals();
-}
-
-/* Изчислява нормален вектор */
-void calculateNormal(struct point *start, struct point *end1, struct point *end2, struct point *normal) {  
-	struct point vector1, vector2;
-	
-	/* Първият вектор */
-	vector1.x = end1->x - start->x;
-	vector1.y = end1->y - start->y;
-	vector1.z = end1->z - start->z;
-	
-	/* Вторият вектор */
-	vector2.x = end2->x - start->x;
-	vector2.y = end2->y - start->y;
-	vector2.z = end2->z - start->z;
-	
-	/* Векторното им произведение */
-	normal->x = vector1.y*vector2.z - vector1.z*vector2.y;
-	normal->y = vector1.z*vector2.x - vector1.x*vector2.z;
-	normal->z = vector1.x*vector2.y - vector1.y*vector2.x;
-}
-
-/*
- * Изчислява нормален вектор на даден връх като средно аритметично на нормалните вектори на полигоните, в които участва.
- * Съседството на върховете е дадено по схемата:
- * i+1 j-1 | i+1 j | i+1 j+1
- * i   j-1 | i   j | i   j+1
- * i-1 j-1 | i-1 j | i-1 j+1
- */
-void vertexNormal(size_t i, size_t j) {
-	struct point normal1, normal2, normal3, normal4;
-	
-	if (i >= buffer_size-1 || j >= buffer_size-1)
-		return;
-		
-	if (i == 0 || j == 0) {
-		calculateNormal(vertex_buffer[i][j].coord, vertex_buffer[i+1][j].coord, vertex_buffer[i][j+1].coord, vertex_buffer[i][j].normal);
-		return;
-	}
-		
-	calculateNormal(vertex_buffer[i][j].coord, vertex_buffer[i][j-1].coord, vertex_buffer[i+1][j].coord, &normal1);
-	calculateNormal(vertex_buffer[i][j].coord, vertex_buffer[i+1][j].coord, vertex_buffer[i][j+1].coord, &normal2);
-	calculateNormal(vertex_buffer[i][j].coord, vertex_buffer[i][j+1].coord, vertex_buffer[i-1][j].coord, &normal3);
-	calculateNormal(vertex_buffer[i][j].coord, vertex_buffer[i][j-1].coord, vertex_buffer[i-1][j].coord, &normal4);
-	
-	vertex_buffer[i][j].normal->x = (normal1.x + normal2.x + normal3.x + normal4.x) * .25f;
-	vertex_buffer[i][j].normal->y = (normal1.y + normal2.y + normal3.y + normal4.y) * .25f;
-	vertex_buffer[i][j].normal->z = (normal1.z + normal2.z + normal3.z + normal4.z) * .25f;
-}
-
-void calculateVertexNormals() {
-	printf("Calculating vertex normals...");
-	for (int i=0; i < buffer_size; i++)
-		for (int j=0; j < buffer_size; j++)
-			vertexNormal(i, j);
-}
 
 /* ----------========== Кодът за рендване ==========---------- */
 
