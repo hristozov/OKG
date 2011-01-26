@@ -92,6 +92,19 @@ void add_point(float x, float y, float z) {
 	fill_polygon_buffer();
 }
 
+void add_polygon_ptr_to_vertex(struct polygon *p, struct vertex *v) {
+	if (p == NULL || v == NULL)
+		return;
+	for (int i=0; i<4; i++) {
+		if (v->p[i] != NULL) {
+			if (v->p[i] == p)
+				return;
+			continue;
+		}
+		v->p[i] = p;
+	}
+}
+
 /* fill_polygon_buffer() запълва буфера за полигони с върховете им и нормалните им вектори */
 void fill_polygon_buffer() {
 	printf("Call to fill_polygon_buffer()\n");
@@ -111,10 +124,19 @@ void fill_polygon_buffer() {
 		for (size_t j=0; j < no_segments-1; j++) {
 			index = i*(no_segments-1) + j;
 			cur = &polygon_buffer[index];
+			
 			cur->v[0] = &vertex_buffer[i][j];
+			add_polygon_ptr_to_vertex(cur, &vertex_buffer[i][j]);
+			
 			cur->v[1] = &vertex_buffer[i+1][j];
+			add_polygon_ptr_to_vertex(cur, &vertex_buffer[i+1][j]);
+			
 			cur->v[2] = &vertex_buffer[i][j+1];
+			add_polygon_ptr_to_vertex(cur, &vertex_buffer[i][j+1]);
+			
 			cur->v[3] = &vertex_buffer[i+1][j+1];
+			add_polygon_ptr_to_vertex(cur, &vertex_buffer[i+1][j+1]);
+			
 			calculateNormal(&cur->v[0]->coord, &cur->v[1]->coord, &cur->v[2]->coord, &cur->normal);
 		}
 }
