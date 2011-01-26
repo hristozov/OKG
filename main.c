@@ -99,7 +99,7 @@ void drawpolygons() {
 					glNormal3f(cur->normal.x, cur->normal.y, cur->normal.z);
 					
 					for (int j=0; j < 4; j++)
-						glVertex3f(cur->p[j]->coord.x, cur->p[j]->coord.y, cur->p[j]->coord.z);
+						glVertex3f(cur->v[j]->coord.x, cur->v[j]->coord.y, cur->v[j]->coord.z);
 				#endif
 			glEnd();
 	}

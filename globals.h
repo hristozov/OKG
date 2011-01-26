@@ -36,7 +36,7 @@ struct vertex {
 };
 
 struct polygon {
-	struct vertex *p[4];
+	struct vertex *v[4];
 	struct point normal;
 };
 

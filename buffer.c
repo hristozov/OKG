@@ -111,10 +111,10 @@ void fill_polygon_buffer() {
 		for (size_t j=0; j < no_segments-1; j++) {
 			index = i*(no_segments-1) + j;
 			cur = &polygon_buffer[index];
-			cur->p[0] = &vertex_buffer[i][j];
-			cur->p[1] = &vertex_buffer[i+1][j];
-			cur->p[2] = &vertex_buffer[i][j+1];
-			cur->p[3] = &vertex_buffer[i+1][j+1];
-			calculateNormal(&cur->p[0]->coord, &cur->p[1]->coord, &cur->p[2]->coord, &cur->normal);
+			cur->v[0] = &vertex_buffer[i][j];
+			cur->v[1] = &vertex_buffer[i+1][j];
+			cur->v[2] = &vertex_buffer[i][j+1];
+			cur->v[3] = &vertex_buffer[i+1][j+1];
+			calculateNormal(&cur->v[0]->coord, &cur->v[1]->coord, &cur->v[2]->coord, &cur->normal);
 		}
 }
