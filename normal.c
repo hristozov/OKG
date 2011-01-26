@@ -34,6 +34,7 @@ void vertex_normal(size_t i, size_t j) {
 	struct vertex *cur = &vertex_buffer[i][j];
 	size_t nelem = 0;
 	float sum_x = 0, sum_y = 0, sum_z = 0;
+	float len = 0.f;
 	
 	/* Невалидни стойности за размера на буфера */
 	if (i >= buffer_size-1 || j >= buffer_size-1)
@@ -56,6 +57,15 @@ void vertex_normal(size_t i, size_t j) {
 	cur->normal.x = sum_x/nelem;
 	cur->normal.y = sum_y/nelem;
 	cur->normal.z = sum_z/nelem;
+	
+	len = VECTOR_LENGTH(cur->normal);
+	
+	if (len == 0.f) /* Don't try to normalize with length zero */
+		return;
+	
+	cur->normal.x /= len;
+	cur->normal.y /= len;
+	cur->normal.z /= len;
 }
 
 /* Изчислява и записва в буфера нормалните вектори на всички върхове */
