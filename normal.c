@@ -32,13 +32,14 @@ void calculateNormal(struct point *start, struct point *end1, struct point *end2
  */
 void vertexNormal(size_t i, size_t j) {
 	struct point normal1, normal2, normal3, normal4;
+	struct vertex *cur = vertex_buffer[i][j];
 	
 	/* Невалидни стойности за размера на буфера */
 	if (i >= buffer_size-1 || j >= buffer_size-1)
 		return;
 		
 	if (i == 0 || j == 0) {
-		calculateNormal(&vertex_buffer[i][j].coord, &vertex_buffer[i+1][j].coord, &vertex_buffer[i][j+1].coord, &vertex_buffer[i][j].normal);
+		calculateNormal(&cur->coord, &cur->coord, &cur->coord, &cur->normal);
 		return;
 	}
 		
@@ -49,9 +50,9 @@ void vertexNormal(size_t i, size_t j) {
 	calculateNormal(&vertex_buffer[i][j].coord, &vertex_buffer[i][j-1].coord, &vertex_buffer[i-1][j].coord, &normal4);
 	
 	/* Записваме в буфера средните стойности на normal[1-4]*/
-	vertex_buffer[i][j].normal.x = (normal1.x + normal2.x + normal3.x + normal4.x) * .25f;
-	vertex_buffer[i][j].normal.y = (normal1.y + normal2.y + normal3.y + normal4.y) * .25f;
-	vertex_buffer[i][j].normal.z = (normal1.z + normal2.z + normal3.z + normal4.z) * .25f;
+	cur->normal.x = (normal1.x + normal2.x + normal3.x + normal4.x) * .25f;
+	cur->normal.y = (normal1.y + normal2.y + normal3.y + normal4.y) * .25f;
+	cur->normal.z = (normal1.z + normal2.z + normal3.z + normal4.z) * .25f;
 }
 
 /* Изчислява и записва в буфера нормалните вектори на всички върхове */
