@@ -18,6 +18,7 @@ void lights();
 void drawpolygons();
 void mouse(int, int, int, int);
 void reshape(int, int);
+void rotateSun(int);
 void render();
 
 /* lights() наглася източника на осветление */
@@ -57,13 +58,14 @@ void lights() {
 
 /* drawpolygons() създава всички полигони, по които ще бъде нарисувано ротационното тяло */
 void drawpolygons() {
-	if (buffer_size < 1) /* Is the buffer empty? */
+	if (buffer_size < 1) /* Празен ли е буферът? */
 		return;
 		
 	#ifndef SMOOTH_SHADING
 		struct point normal;
 	#endif
 	
+	/* Цвят на полигоните, които ще нарисуваме */
 	float model_color[] = {1, .2, .2};
 	
 	glEnable(GL_POLYGON_SMOOTH);
@@ -159,9 +161,10 @@ void reshape(int x, int y) {
 	glutPostRedisplay();
 }
 
-void timer(int foo) {
+/* Таймер за смяна на позицията на слънцето */
+void rotateSun(int foo) {
 	alpha_degrees += 3;
-	glutTimerFunc(30,timer,0);
+	glutTimerFunc(30,rotateSun,0);
 	glutPostRedisplay();
 }
 
@@ -220,7 +223,7 @@ int main(int argc, char **argv) {
 	
 	glutDisplayFunc(render);
 	glutMouseFunc(mouse);
-	glutTimerFunc(20, timer, 0);
+	glutTimerFunc(20, rotateSun, 0);
 	
 	glutMainLoop();
 	
