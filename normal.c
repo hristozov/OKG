@@ -33,6 +33,8 @@ void calculateNormal(struct point *start, struct point *end1, struct point *end2
 void vertexNormal(size_t i, size_t j) {
 	struct point normal1, normal2, normal3, normal4;
 	struct vertex *cur = vertex_buffer[i][j];
+	size_t nelem = 0;
+	float sum_x = 0, sum_y = 0, sum_z = 0;
 	
 	/* Невалидни стойности за размера на буфера */
 	if (i >= buffer_size-1 || j >= buffer_size-1)
@@ -43,16 +45,18 @@ void vertexNormal(size_t i, size_t j) {
 		return;
 	}
 		
-	/* Изчисляваме нормалните вектори на полигоните, в които участва върхът [i][j] и ги записваме в normal[1-4] */
-	calculateNormal(&vertex_buffer[i][j].coord, &vertex_buffer[i][j-1].coord, &vertex_buffer[i+1][j].coord, &normal1);
-	calculateNormal(&vertex_buffer[i][j].coord, &vertex_buffer[i+1][j].coord, &vertex_buffer[i][j+1].coord, &normal2);
-	calculateNormal(&vertex_buffer[i][j].coord, &vertex_buffer[i][j+1].coord, &vertex_buffer[i-1][j].coord, &normal3);
-	calculateNormal(&vertex_buffer[i][j].coord, &vertex_buffer[i][j-1].coord, &vertex_buffer[i-1][j].coord, &normal4);
+	for (int i=0; i<4; i++) {
+		if (cur->p[i] == NULL)
+			break;
+		sum_x += cur->p[i].normal.x;
+		sum_y += cur->p[i].normal.y;
+		sum_z += cur->p[i].normal.z;
+		nelem++;
+	}
 	
-	/* Записваме в буфера средните стойности на normal[1-4]*/
-	cur->normal.x = (normal1.x + normal2.x + normal3.x + normal4.x) * .25f;
-	cur->normal.y = (normal1.y + normal2.y + normal3.y + normal4.y) * .25f;
-	cur->normal.z = (normal1.z + normal2.z + normal3.z + normal4.z) * .25f;
+	cur->normal.x = sum_x/nelem;
+	cur->normal.y = sum_z/nelem;
+	cur->normal.z = sum_z/nelem;
 }
 
 /* Изчислява и записва в буфера нормалните вектори на всички върхове */
