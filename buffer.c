@@ -140,6 +140,6 @@ void fill_polygon_buffer() {
 			cur->v[3] = &vertex_buffer[i+1][j+1];
 			add_polygon_ptr_to_vertex(cur, &vertex_buffer[i+1][j+1]);
 			
-			calculateNormal(&cur->v[0]->coord, &cur->v[1]->coord, &cur->v[2]->coord, &cur->normal);
+			calculate_normal(&cur->v[0]->coord, &cur->v[1]->coord, &cur->v[2]->coord, &cur->normal);
 		}
 }

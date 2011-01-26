@@ -2,7 +2,7 @@
 #include "normal.h"
 
 /* Изчислява нормален вектор */
-void calculateNormal(struct point *start, struct point *end1, struct point *end2, struct point *normal) {  
+void calculate_normal(struct point *start, struct point *end1, struct point *end2, struct point *normal) {  
 	struct point vector1, vector2;
 	
 	/* Първият вектор */
@@ -30,7 +30,7 @@ void calculateNormal(struct point *start, struct point *end1, struct point *end2
  * i   j-1 | i   j | i   j+1
  * i-1 j-1 | i-1 j | i-1 j+1
  */
-void vertexNormal(size_t i, size_t j) {
+void vertex_normal(size_t i, size_t j) {
 	struct point normal1, normal2, normal3, normal4;
 	struct vertex *cur = vertex_buffer[i][j];
 	size_t nelem = 0;
@@ -41,7 +41,7 @@ void vertexNormal(size_t i, size_t j) {
 		return;
 		
 	if (i == 0 || j == 0) {
-		calculateNormal(&cur->coord, &cur->coord, &cur->coord, &cur->normal);
+		calculate_normal(&cur->coord, &cur->coord, &cur->coord, &cur->normal);
 		return;
 	}
 		
@@ -60,11 +60,11 @@ void vertexNormal(size_t i, size_t j) {
 }
 
 /* Изчислява и записва в буфера нормалните вектори на всички върхове */
-void calculateVertexNormals() {
+void calculate_vertex_normals() {
 	printf("Calculating vertex normals...\n");
 	for (int i=0; i < buffer_size; i++)
 		for (int j=0; j < no_segments; j++)
-			vertexNormal(i, j);
+			vertex_normal(i, j);
 }
 
 #endif
