@@ -117,7 +117,7 @@ void fill_polygon_buffer() {
 	if (polygon_buffer != NULL)
 		free (polygon_buffer);
 		
-	polygon_size = (buffer_size-1) * (no_segments-1);
+	polygon_size = (buffer_size-1) * (no_segments);
 	
 	if (polygon_size == 0) /* Нямаме достатъчно точки за построяване на полигона */
 		return;
@@ -125,8 +125,8 @@ void fill_polygon_buffer() {
 	polygon_buffer = malloc (polygon_size * sizeof(struct polygon));
 	
 	for (size_t i=0; i < buffer_size-1; i++)
-		for (size_t j=0; j < no_segments-1; j++) {
-			index = i*(no_segments-1) + j;
+		for (size_t j=0; j < no_segments; j++) {
+			index = i*(no_segments) + j;
 			cur = &polygon_buffer[index];
 			
 			cur->v[0] = &vertex_buffer[i][j];
@@ -135,12 +135,11 @@ void fill_polygon_buffer() {
 			cur->v[1] = &vertex_buffer[i+1][j];
 			add_polygon_ptr_to_vertex(cur, &vertex_buffer[i+1][j]);
 			
-			cur->v[2] = &vertex_buffer[i][j+1];
-			add_polygon_ptr_to_vertex(cur, &vertex_buffer[i][j+1]);
+			cur->v[2] = &vertex_buffer[i][(j+1)%(no_segments)];
+			add_polygon_ptr_to_vertex(cur, &vertex_buffer[i][(j+1)%(no_segments)]);
 			
-			cur->v[3] = &vertex_buffer[i+1][j+1];
-			add_polygon_ptr_to_vertex(cur, &vertex_buffer[i+1][j+1]);
-			
+			cur->v[3] = &vertex_buffer[i+1][(j+1)%(no_segments)];
+			add_polygon_ptr_to_vertex(cur, &vertex_buffer[i+1][(j+1)%(no_segments)]);
 			calculate_normal(&cur->v[0]->coord, &cur->v[1]->coord, &cur->v[2]->coord, &cur->normal);
 		}
 }
