@@ -15,9 +15,13 @@
 /* Градусите за ротиране на "слънцето" */
 int alpha_degrees = 0;
 
+/* На колко градуса да се завърти относно x и y */
+int diff_x = 0, diff_y = 0;
+
 void lights();
 void drawpolygons();
 void mouse(int, int, int, int);
+void keyboard(int, int, int);
 void reshape(int, int);
 void rotateSun(int);
 void render();
@@ -133,6 +137,18 @@ void mouse (int button, int state, int mx, int my) {
 	}
 }
 
+/* Callback за клавиатурата. Използва се за въртене. */
+void keyboard (int key, int x, int y) {
+	if (key == GLUT_KEY_UP)
+		diff_x += 15;
+	if (key == GLUT_KEY_DOWN)
+		diff_x -= 15;
+	if (key == GLUT_KEY_LEFT)
+		diff_y -= 15;
+	if (key == GLUT_KEY_RIGHT)
+		diff_y += 15;
+}
+
 /* Callback за смяна на размера на прозореца */
 void reshape(int x, int y) {
 	g_x = x; g_y = y;
@@ -171,6 +187,9 @@ void render() {
 	gluPerspective(60,1,2,200);
 	gluLookAt(1,1,+40,0,7,0,0,1,0);
 	
+	glRotatef((float)diff_x, 1.f, 0, 0);
+	glRotatef((float)diff_y, 0, 1.f, 0);
+	
 	lights();
 	drawmodel();
 	
@@ -203,6 +222,7 @@ int main(int argc, char **argv) {
 	
 	glutDisplayFunc(render);
 	glutMouseFunc(mouse);
+	glutSpecialFunc(keyboard);
 	glutTimerFunc(20, rotateSun, 0);
 	
 	glutMainLoop();
