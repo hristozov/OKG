@@ -13,35 +13,45 @@ void buffer_init() {
 /* Преоразмеряване на vertex буфера */
 void vertex_buffer_resize(size_t new_size) {
 	printf("buffer_resize() - old size: %lu new size: %lu\n", buffer_size, new_size);
+	
+	/* Ако новият размер е нула, просто унищожаваме буфера.
+	 * Буферът с полигоните също ще бъде премахнат, но той така или иначе е зависим от вертексния */
 	if (new_size == 0) {
 		buffer_kill();
 		return;
 	}
 	
+	/* Смаляваме буфера */
 	if (new_size < buffer_size) {
-		for (size_t i = buffer_size; i > new_size; i--) {
+		/* Изчистваме вече ненужните елементи */
+		for (size_t i = buffer_size; i > new_size; i--)
 			free(vertex_buffer[i-1]);
-		}
 			
+		/* Накрая реалокираме паметта */
 		if ((vertex_buffer = (struct vertex**) realloc(vertex_buffer, new_size * sizeof(struct vertex*))) == NULL)
 			exit(-1);
-			
-		buffer_size = new_size;
 	}
 	
+	/* Увеличаваме буфера */
 	if (new_size > buffer_size) {
+		/* Реалокираме буфера с новия размер */
 		if ((vertex_buffer = (struct vertex**) realloc(vertex_buffer, new_size * sizeof(struct vertex*))) == NULL)
 			exit(-1);
 		
+		/* Добавяме всеки от елементите (масиви от vertex структури) на буфера */
 		for (size_t i = buffer_size; i < new_size; i++) {
+			/* Заделяме памет за масив от vertex-и */
 			if ((vertex_buffer[i] = (struct vertex*) calloc(no_segments, sizeof(struct vertex))) == NULL)
 				exit(-1);
+				
+			/* Нулираме полетата с указатели във всеки vertex */
 			for (size_t j=0; j < no_segments; j++)
 				vertex_buffer[i][j].p[0] = vertex_buffer[i][j].p[1] = vertex_buffer[i][j].p[2] = vertex_buffer[i][j].p[3] = NULL;
 		}
-		
-		buffer_size = new_size;
 	}
+	
+	/* Записваме новия размер */
+	buffer_size = new_size;
 }
 
 /* Освобождаване на паметта */
