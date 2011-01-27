@@ -1,7 +1,7 @@
 #include "buffer.h"
 #include "normal.h"
 
-/* Инициализация на vertex буфера */
+/* Инициализация на буферите */
 void buffer_init() {
 	buffer_size = 0;
 	vertex_buffer = NULL;
@@ -56,9 +56,9 @@ void vertex_buffer_resize(size_t new_size) {
 
 /* Освобождаване на паметта */
 void buffer_kill() {
-	for (size_t i=0; i < buffer_size; i++) {
+	for (size_t i=0; i < buffer_size; i++)
 		free(vertex_buffer[i]);
-	}
+		
 	free(vertex_buffer);
 	vertex_buffer = NULL;
 	buffer_size = 0;
