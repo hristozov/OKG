@@ -40,7 +40,7 @@ void vertex_normal(size_t i, size_t j) {
 	if (i >= buffer_size || j >= no_segments)
 		return;
 		
-	for (int i=0; i<4; i++) {
+	for (size_t i=0; i<4; i++) {
 		if (cur->p[i] == NULL)
 			break;
 		sum_x += cur->p[i]->normal.x;
