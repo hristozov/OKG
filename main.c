@@ -111,11 +111,6 @@ void drawmodel() {
 	drawpolygons();
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
-		glRotatef(90,0,1,0);
-		drawpolygons();
-		glRotatef(90,0,1,0);
-		drawpolygons();
-		glRotatef(90,0,1,0);
 		drawpolygons();
 	glPopMatrix();
 }
