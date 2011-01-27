@@ -63,6 +63,12 @@ void buffer_kill() {
  * Оста има координати (0, y, 0)
  */
 void add_point(float x, float y, float z) {
+	/* Проверяваме дали точката вече не е добавена и излизаме, ако това е вярно */
+	for (size_t i=0; i < buffer_size; i++)
+		if (vertex_buffer[i][0].coord.x == x && vertex_buffer[i][0].coord.y == y && vertex_buffer[i][0].coord.z == z)
+			return;
+			
+	/* Изчисляваме текущия индекс в буфера и преоразмеряваме */
 	size_t cur_index = buffer_size;
 	vertex_buffer_resize(buffer_size + 1);
 	
