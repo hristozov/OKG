@@ -1,4 +1,8 @@
-/* gcc -pipe -g -Wall -std=c99 -D_GNU_SOURCE  -lm -lGLU -lglut -o project main.c */
+/*
+ * В main.c се съхранява основният код за боравяне с GLUT
+ * Тук се намират и callback функциите
+ */
+
 #include <math.h>
 #include <stdio.h>
 
