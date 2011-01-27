@@ -3,7 +3,6 @@
  * Тук се намират и callback функциите
  */
 
-#include <math.h>
 #include <stdio.h>
 
 #include <GL/glut.h>

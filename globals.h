@@ -3,6 +3,7 @@
  */
 
 #pragma once
+#include <math.h> /* sqrtf() */
 #include <stdlib.h> /* size_t */
 
 /* Глобален макрос, определящ какъв shading метод да се ползва */
