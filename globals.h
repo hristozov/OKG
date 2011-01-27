@@ -1,6 +1,7 @@
 #pragma once
 #include <stdlib.h> /* size_t */
 
+/* Глобален макрос, определящ какъв shading метод да се ползва */
 #define SMOOTH_SHADING 1
 
 /* g_x и g_y регулират размера на прозореца */
@@ -31,19 +32,22 @@ extern int g_y;
 /* no_segments определя колко страни трябва да имат многоъгълниците, с които апроксимираме окръжностите около оста */
 extern size_t no_segments;
 
+/* Точка в пространството */
 struct point {
 	float x,y,z;
 };
 
+/* Структура за съхраняване на отделните върхове в ротационното тяло */
 struct vertex {
-	struct point coord;
-	struct point normal;
-	struct polygon *p[4];
+	struct point coord; /* Координати на текущия връх */
+	struct point normal; /* Нормален вектор на върха (зададен като точка) */
+	struct polygon *p[4]; /* Списък от полигоните, в които участва даденият връх */
 };
 
+/* Структура за съхраняване на отделните полигони (трапци), които ще бъдат рисувани */
 struct polygon {
-	struct vertex *v[4];
-	struct point normal;
+	struct vertex *v[4]; /* Списък от върховете, от които е съставен полигонът */
+	struct point normal; /* Нормален вектор на полигона (зададен като точка) */
 };
 
 /* Глобалният буфер, в който съхраняваме всички vertex-и */

@@ -1,7 +1,7 @@
 #include "buffer.h"
 #include "normal.h"
 
-/* Изчислява нормален вектор */
+/* Изчислява нормален вектор като произведение на два вектора с еднакво начало и два края */
 void calculate_normal(struct point *start, struct point *end1, struct point *end2, struct point *normal) {  
 	struct point vector1, vector2;
 	
@@ -21,10 +21,10 @@ void calculate_normal(struct point *start, struct point *end1, struct point *end
 	normal->z = vector1.x*vector2.y - vector1.y*vector2.x;
 }
 
-#ifdef SMOOTH_SHADING
+#ifdef SMOOTH_SHADING /* Функциите не са ни нужни при flat shading */
 
 /*
- * Изчислява нормален вектор на даден връх като средно аритметично на нормалните вектори на полигоните, в които участва.
+ * Изчислява нормален вектор на даден връх като нормирано средно аритметично на нормалните вектори на полигоните, в които участва.
  * Съседството на върховете е дадено по схемата:
  * i+1 j-1 | i+1 j | i+1 j+1
  * i   j-1 | i   j | i   j+1
@@ -40,6 +40,7 @@ void vertex_normal(size_t i, size_t j) {
 	if (i >= buffer_size || j >= no_segments)
 		return;
 		
+	/* Сумираме векторите на всички околни полигони */
 	for (size_t i=0; i<4; i++) {
 		if (cur->p[i] == NULL)
 			break;
@@ -49,15 +50,18 @@ void vertex_normal(size_t i, size_t j) {
 		nelem++;
 	}
 	
+	/* Намираме средните стойности на координатите и ги записваме в normal */
 	cur->normal.x = sum_x/nelem;
 	cur->normal.y = sum_y/nelem;
 	cur->normal.z = sum_z/nelem;
 	
+	/* Дължината на вектора, която ще ни служи за нормиране */
 	len = VECTOR_LENGTH(cur->normal);
 	
-	if (len == 0.f) /* Don't try to normalize with length zero */
+	if (len == 0.f) /* Не нормираме при нулева дължина */
 		return;
 	
+	/* Нормираме */
 	cur->normal.x /= len;
 	cur->normal.y /= len;
 	cur->normal.z /= len;
