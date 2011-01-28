@@ -18,6 +18,9 @@ int alpha_degrees = 0;
 /* На колко градуса да се завърти относно x и y */
 int diff_x = 0, diff_y = 0;
 
+/* Ниво на zoom-ване */
+int zoom_level = 40;
+
 void lights();
 void drawpolygons();
 void mouse(int, int, int, int);
@@ -121,20 +124,24 @@ void drawmodel() {
 
 /* Callback за действията с мишката */
 void mouse (int button, int state, int mx, int my) {
-	if(button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
-		if (IS_IN_LEFT_VIEWPORT(mx)) { /* Точката е във viewport-а на ротационното тяло */
-			printf("Control point position is in viewport; ignoring!\n");
-			return;
-		}
+	switch(button) {
+		case GLUT_LEFT_BUTTON:
+			if (IS_IN_RIGHT_VIEWPORT(mx) && state == GLUT_DOWN) {
+				float x = PROJECT_IN_X(mx);
+				float y = PROJECT_IN_Y(my);
 		
-		float x = PROJECT_IN_X(mx);
-		float y = PROJECT_IN_Y(my);
-		
-		printf("Adding point %f %f %f (converted from %d %d %d)\n", x, y, 0.f, mx, my, 0);
-		add_point(x, y, 0);
-		
-		glutPostRedisplay();
+				printf("Adding point %f %f %f (converted from %d %d %d)\n", x, y, 0.f, mx, my, 0);
+				add_point(x, y, 0);
+			}
+			break;
+		case 3: /* mouse wheel надолу */
+			zoom_level -= 1;
+			break;
+		case 4: /* mouse wheel нагоре */
+			zoom_level += 1;
+			break;
 	}
+	glutPostRedisplay();
 }
 
 /* Callback за клавиатурата. Използва се за въртене. */
@@ -185,7 +192,7 @@ void render() {
 	glLoadIdentity();
 
 	gluPerspective(60,1,2,200);
-	gluLookAt(1,1,+40,0,7,0,0,1,0);
+	gluLookAt(1,1,zoom_level,0,7,0,0,1,0);
 	
 	glRotatef((float)diff_x, 1.f, 0, 0);
 	glRotatef((float)diff_y, 0, 1.f, 0);
