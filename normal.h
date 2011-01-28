@@ -10,7 +10,7 @@
 
 void calculate_normal(struct point*, struct point*, struct point*, struct point*);
 
-#ifdef SMOOTH_SHADING
+#if SMOOTH_SHADING == 1
 void vertex_normal(size_t, size_t);
 void calculate_vertex_normals();
 #endif

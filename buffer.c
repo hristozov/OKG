@@ -101,7 +101,7 @@ void add_point(float x, float y, float z) {
 	/* Винаги първо запълваме буфера с полигоните.
 	 * Там се намират нормалните им вектори, които по-късно ще послужат при евентуално ползване на calculate_vertex_normals() */
 	fill_polygon_buffer();
-	#ifdef SMOOTH_SHADING
+	#if SMOOTH_SHADING == 1
 		calculate_vertex_normals(); /* Изчисляваме нормалните вектори на всеки връх */
 	#endif
 }

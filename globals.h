@@ -9,6 +9,9 @@
 /* Глобален макрос, определящ какъв shading метод да се ползва */
 #define SMOOTH_SHADING 1
 
+/* Глобален макрос, определящ дали да се показват нормалните вектори на vertex-ите (за debug) */
+#define SHOW_VERTEX_NORMALS 0
+
 /* g_x и g_y регулират размера на прозореца */
 extern int g_x;
 extern int g_y;

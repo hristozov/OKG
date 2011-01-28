@@ -21,7 +21,7 @@ void calculate_normal(struct point *start, struct point *end1, struct point *end
 	normal->z = vector1.x*vector2.y - vector1.y*vector2.x;
 }
 
-#ifdef SMOOTH_SHADING /* Функциите не са ни нужни при flat shading */
+#if SMOOTH_SHADING == 1 /* Функциите не са ни нужни при flat shading */
 
 /*
  * Изчислява нормален вектор на даден връх като нормирано средно аритметично на нормалните вектори на полигоните, в които участва.

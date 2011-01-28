@@ -77,7 +77,7 @@ void drawpolygons() {
 	glEnable(GL_POLYGON_SMOOTH);
 	glEnable(GL_LINE_SMOOTH);
 	
-	#ifdef SMOOTH_SHADING
+	#if SMOOTH_SHADING == 1
 		glShadeModel(GL_SMOOTH);
 	#else
 		glShadeModel(GL_FLAT);
@@ -96,7 +96,7 @@ void drawpolygons() {
 				glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, model_color);
 				
 				/* Сега вече добавяме върховете на трапеца */
-				#ifdef SMOOTH_SHADING
+				#if SMOOTH_SHADING == 1
 					/* В този случай викаме glNormal3f преди всеки glVertex3f */
 					for (size_t j=0; j < 4; j++) {
 						glNormal3f(cur->v[j]->normal.x, cur->v[j]->normal.y, cur->v[j]->normal.z);
@@ -110,6 +110,16 @@ void drawpolygons() {
 						glVertex3f(cur->v[j]->coord.x, cur->v[j]->coord.y, cur->v[j]->coord.z);
 				#endif
 			glEnd();
+			
+			/* Код за debug - показва нормалните вектори на всеки връх */
+			#if SMOOTH_SHADING == 1 && SHOW_VERTEX_NORMALS == 1
+				for (size_t j=0; j < 4; j++) {
+					glBegin (GL_LINES);
+						glVertex3f(cur->v[j]->coord.x, cur->v[j]->coord.y, cur->v[j]->coord.z);
+						glVertex3f(cur->v[j]->coord.x + cur->v[j]->normal.x, cur->v[j]->coord.y + cur->v[j]->normal.y, cur->v[j]->coord.z + cur->v[j]->normal.z);
+					glEnd();
+				}
+			#endif
 	}
 }
 
