@@ -144,7 +144,7 @@ void fill_polygon_buffer() {
 	if (polygon_size == 0) /* Нямаме достатъчно точки за построяване на полигона, ще се занимаваме с това по-късно */
 		return;
 		
-	polygon_buffer = malloc (polygon_size * sizeof(struct polygon));
+	polygon_buffer = (struct polygon*) malloc (polygon_size * sizeof(struct polygon));
 	
 	/* В следващите два цикъла обхождаме всички елементи на vertex_buffer, тоест всички върхове */
 	for (size_t i=0; i < buffer_size-1; i++)
