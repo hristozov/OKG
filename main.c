@@ -115,7 +115,6 @@ void drawpolygons() {
 
 /* drawmodel() рисува ротационното тяло */
 void drawmodel() {
-	drawpolygons();
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 		drawpolygons();
