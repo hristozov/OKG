@@ -117,6 +117,8 @@ void drawpolygons() {
 void drawmodel() {
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
+		glRotatef((float)diff_x, 1.f, 0, 0);
+		glRotatef((float)diff_y, 0, 1.f, 0);
 		drawpolygons();
 	glPopMatrix();
 }
@@ -191,9 +193,6 @@ void render() {
 
 	gluPerspective(60,1,2,200);
 	gluLookAt(1,1,zoom_level,0,7,0,0,1,0);
-	
-	glRotatef((float)diff_x, 1.f, 0, 0);
-	glRotatef((float)diff_y, 0, 1.f, 0);
 	
 	lights();
 	drawmodel();
