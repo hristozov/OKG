@@ -98,6 +98,10 @@ void add_point(float x, float y, float z) {
 		vertex_buffer[cur_index][i].coord.z = r * sinf(angle);
 	}
 	
+	#if SORT_CONTROL_POINTS == 1
+		sort_control_points();
+	#endif
+	
 	/* Винаги първо запълваме буфера с полигоните.
 	 * Там се намират нормалните им вектори, които по-късно ще послужат при евентуално ползване на calculate_vertex_normals() */
 	fill_polygon_buffer();
@@ -169,3 +173,32 @@ void fill_polygon_buffer() {
 			calculate_normal(&cur->v[0]->coord, &cur->v[1]->coord, &cur->v[2]->coord, &cur->normal);
 		}
 }
+
+#if SORT_CONTROL_POINTS == 1
+
+void swap_indexes(size_t i, size_t j) {
+	printf("Swapping %lu and %lu\n", i, j);
+	
+	size_t len = no_segments * sizeof(struct vertex);
+	struct vertex *tmp;
+	
+	if ((tmp = (struct vertex*) malloc(len)) == NULL)
+		exit(-1);
+		
+	memcpy(tmp, vertex_buffer[i], len);
+	memcpy(vertex_buffer[i], vertex_buffer[j], len);
+	memcpy(vertex_buffer[j], tmp, len);
+	free(tmp);
+}
+
+void sort_control_points() {
+	char swapped = 0;
+	do {
+		for (size_t i=1; i < buffer_size; i++) 
+			if (vertex_buffer[i-1][0].coord.y > vertex_buffer[i][0].coord.y)
+				swap_indexes(i-1, i);
+		swapped = 0;
+	} while(swapped);
+}
+
+#endif
