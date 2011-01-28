@@ -111,6 +111,21 @@ void drawpolygons() {
 				#endif
 			glEnd();
 			
+			/* Код за debug - показва нормалните вектори на всеки полигон */
+			#if SHOW_POLYGON_NORMALS == 1
+				float sum_x = 0.f, sum_y = 0.f, sum_z = 0.f;
+				for (size_t j=0; j < 4; j++) {
+					sum_x += cur->v[j]->coord.x;
+					sum_y += cur->v[j]->coord.y;
+					sum_z += cur->v[j]->coord.z;
+				}
+
+				glBegin (GL_LINES);
+					glVertex3f(sum_x*.25f, sum_y*.25f, sum_z*.25f);
+					glVertex3f((sum_x*.25f)+cur->normal.x, (sum_y*.25f)+cur->normal.y, (sum_z*.25f)+cur->normal.z);
+				glEnd();
+			#endif
+			
 			/* Код за debug - показва нормалните вектори на всеки връх */
 			#if SMOOTH_SHADING == 1 && SHOW_VERTEX_NORMALS == 1
 				for (size_t j=0; j < 4; j++) {
