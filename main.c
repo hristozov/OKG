@@ -51,15 +51,15 @@ void lights() {
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 
-	glRotatef(28, 0, 0, 1);
-	glRotatef(alpha_degrees,0,1,0);
-	glTranslatef(-25,0,0);
+		glRotatef(28, 0, 0, 1);
+		glRotatef(alpha_degrees,0,1,0);
+		glTranslatef(-25,0,0);
 	
-	glLightfv(GL_LIGHT0, GL_POSITION, pos);
+		glLightfv(GL_LIGHT0, GL_POSITION, pos);
 
-	glMaterialfv(GL_FRONT, GL_EMISSION, yellow);
-	glutSolidSphere(3,20,20);
-	glMaterialfv(GL_FRONT, GL_EMISSION, black);
+		glMaterialfv(GL_FRONT, GL_EMISSION, yellow);
+		glutSolidSphere(3,20,20);
+		glMaterialfv(GL_FRONT, GL_EMISSION, black);
 
 	glPopMatrix();
 }
