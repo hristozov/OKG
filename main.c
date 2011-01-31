@@ -86,11 +86,13 @@ void drawpolygons() {
 	glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER,1);
 	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE,0);
 			
-	for (size_t i=0; i < polygon_size; i++) {
+	for (size_t i=0; i < P_SIZE; i++) 
+		for (size_t j=0; j < no_segments; j++) {
 			/*
 			 * Добавяме нов полигон (всъщност трапец) от буфера
 			 */
-			cur = &polygon_buffer[i];
+			cur = &polygon_buffer[i][j];
+			struct vertex *ll = GET_LL_V(i, j), *ul = GET_UL_V(i, j), *lr = GET_LR_V(i, j), *ur = GET_UR_V(i, j);
 			
 			glBegin(GL_TRIANGLE_STRIP);
 				glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, model_color);
@@ -98,18 +100,25 @@ void drawpolygons() {
 				/* Сега вече добавяме върховете на трапеца */
 				#if SMOOTH_SHADING == 1
 					/* В този случай викаме glNormal3f преди всеки glVertex3f */
-					for (size_t j=0; j < 4; j++) {
-						glNormal3f(cur->v[j]->normal.x, cur->v[j]->normal.y, cur->v[j]->normal.z);
-						glVertex3f(cur->v[j]->coord.x, cur->v[j]->coord.y, cur->v[j]->coord.z);
-					}
+					glNormal3f(ll->normal.x, ll->normal.y, ll->normal.z);
+					glVertex3f(ll->coord.x, ll->coord.y, ll->coord.z);
+					glNormal3f(ul->normal.x, ul->normal.y, ul->normal.z);
+					glVertex3f(ul->coord.x, ul->coord.y, ul->coord.z);
+					glNormal3f(lr->normal.x, lr->normal.y, lr->normal.z);
+					glVertex3f(lr->coord.x, lr->coord.y, lr->coord.z);
+					glNormal3f(ur->normal.x, ur->normal.y, ur->normal.z);
+					glVertex3f(ur->coord.x, ur->coord.y, ur->coord.z);
 				#else
 					/* Изчисляваме нормален вектор само за целия трапец */
 					glNormal3f(cur->normal.x, cur->normal.y, cur->normal.z);
 					
-					for (size_t j=0; j < 4; j++)
-						glVertex3f(cur->v[j]->coord.x, cur->v[j]->coord.y, cur->v[j]->coord.z);
+					glVertex3f(ll->coord.x, ll->coord.y, ll->coord.z);
+					glVertex3f(ul->coord.x, ul->coord.y, ul->coord.z);
+					glVertex3f(lr->coord.x, lr->coord.y, lr->coord.z);
+					glVertex3f(ur->coord.x, ur->coord.y, ur->coord.z);
 				#endif
 			glEnd();
+			
 			
 			/* Код за debug - показва нормалните вектори на всеки полигон */
 			#if SHOW_POLYGON_NORMALS == 1
@@ -135,7 +144,7 @@ void drawpolygons() {
 					glEnd();
 				}
 			#endif
-	}
+		}
 }
 
 /* drawmodel() рисува ротационното тяло */
@@ -240,6 +249,7 @@ int main(int argc, char **argv) {
 	add_point(4.f, 5.f, 0.f);
 	add_point(7.f, 8.f, 0.f);
 	add_point(9.f, 9.f, 0.f);
+	
 			
 	glutInit(&argc, argv);
 	

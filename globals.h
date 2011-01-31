@@ -43,6 +43,34 @@ extern int g_y;
 #define PROJECT_IN_X(x) ((float)(((x)-(g_x/VIEWPORT_FACTOR))*(PROJECT_INTERVAL_X/(g_x-g_x/VIEWPORT_FACTOR))))
 #define PROJECT_IN_Y(y) (PROJECT_INTERVAL_Y - (float)((y)*(PROJECT_INTERVAL_Y/g_y)))
 
+/* Тези макроси взимат за аргумент индексите на даден връх и връщат полигоните от неговите различни страни
+ * Индексът на всеки полигон [i][j] означава, че [i][j] е върхът в долния му ляв ъгъл.
+ * Двубуквеното съкращение в средата означава:
+ * Първа буква: U=upper ; L=lower
+ * Втора буква: L=left ; R=right */
+ 
+#define NORMALIZE_J(j) (((j) + no_segments) % no_segments)
+
+#define CHECK_I_P(i) (((i) >= 0) && ((i) < P_SIZE))
+#define GET_P(i, j) ((CHECK_I_P((i))) ? &polygon_buffer[(i)][NORMALIZE_J((j))] : NULL)
+ 
+#define GET_LL_P(i, j) (GET_P(i-1, j-1))
+#define GET_UL_P(i, j) (GET_P((i), (j)-1))
+#define GET_UR_P(i, j) (GET_P((i), (j)))
+#define GET_LR_P(i, j) (GET_P((i)-1, (j)))
+
+/* Тези макроси взимат за аргумент индексите на полигон и връщат върховете, от които е съставен
+ * Отново взимаме предвид, че полигонът [i][j] има връх [i][j] долу вляво
+ * Съкращенията са аналогични */
+
+#define CHECK_I_V(i) (((i) >= 0) && ((i) < V_SIZE))
+#define GET_V(i, j) ((CHECK_I_V((i))) ? &vertex_buffer[(i)][NORMALIZE_J((j))] : NULL)
+
+#define GET_LL_V(i, j) (GET_V((i), (j)))
+#define GET_UL_V(i, j) (GET_V((i)+1, (j)))
+#define GET_UR_V(i, j) (GET_V((i)+1, (j)+1))
+#define GET_LR_V(i, j) (GET_V((i), (j)+1))
+
 /* no_segments определя колко страни трябва да имат многоъгълниците, с които апроксимираме окръжностите около оста */
 extern size_t no_segments;
 
@@ -55,12 +83,12 @@ struct point {
 struct vertex {
 	struct point coord; /* Координати на текущия връх */
 	struct point normal; /* Нормален вектор на върха (зададен като точка) */
-	struct polygon *p[4]; /* Списък от полигоните, в които участва даденият връх */
+	//struct polygon *p[4]; /* Списък от полигоните, в които участва даденият връх */
 };
 
 /* Структура за съхраняване на отделните полигони (трапци), които ще бъдат рисувани */
 struct polygon {
-	struct vertex *v[4]; /* Списък от върховете, от които е съставен полигонът */
+	//struct vertex *v[4]; /* Списък от върховете, от които е съставен полигонът */
 	struct point normal; /* Нормален вектор на полигона (зададен като точка) */
 };
 
@@ -68,5 +96,7 @@ struct polygon {
 extern size_t buffer_size;
 extern struct vertex **vertex_buffer;
 
-extern size_t polygon_size;
-extern struct polygon *polygon_buffer;
+extern struct polygon **polygon_buffer;
+
+#define V_SIZE buffer_size
+#define P_SIZE (buffer_size > 0 ? (buffer_size-1) : 0)

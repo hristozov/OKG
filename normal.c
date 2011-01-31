@@ -32,6 +32,7 @@ void calculate_normal(struct point *start, struct point *end1, struct point *end
  */
 void vertex_normal(size_t i, size_t j) {
 	struct vertex *cur = &vertex_buffer[i][j];
+	struct polygon *cur_p = NULL;
 	size_t nelem = 0;
 	float sum_x = 0, sum_y = 0, sum_z = 0;
 	float len = 0.f;
@@ -39,14 +40,32 @@ void vertex_normal(size_t i, size_t j) {
 	/* Невалидни стойности за размера на буфера */
 	if (i >= buffer_size || j >= no_segments)
 		return;
-		
-	/* Сумираме векторите на всички околни полигони */
-	for (size_t i=0; i<4; i++) {
-		if (cur->p[i] == NULL)
-			break;
-		sum_x += cur->p[i]->normal.x;
-		sum_y += cur->p[i]->normal.y;
-		sum_z += cur->p[i]->normal.z;
+	
+	if ((cur_p = GET_LL_P(i, j)) != NULL) {
+		sum_x += cur_p->normal.x;
+		sum_y += cur_p->normal.y;
+		sum_z += cur_p->normal.z;
+		nelem++;
+	}
+	
+	if ((cur_p = GET_UL_P(i, j)) != NULL) {
+		sum_x += cur_p->normal.x;
+		sum_y += cur_p->normal.y;
+		sum_z += cur_p->normal.z;
+		nelem++;
+	}
+	
+	if ((cur_p = GET_LR_P(i, j)) != NULL) {
+		sum_x += cur_p->normal.x;
+		sum_y += cur_p->normal.y;
+		sum_z += cur_p->normal.z;
+		nelem++;
+	}
+	
+	if ((cur_p = GET_UR_P(i, j)) != NULL) {
+		sum_x += cur_p->normal.x;
+		sum_y += cur_p->normal.y;
+		sum_z += cur_p->normal.z;
 		nelem++;
 	}
 	
