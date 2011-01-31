@@ -97,7 +97,11 @@ void drawpolygons() {
 			glBegin(GL_TRIANGLE_STRIP);
 				glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, model_color);
 				
-				/* Сега вече добавяме върховете на трапеца */
+				/* Сега вече добавяме върховете на трапеца. Подредбата е:
+				 * 1. Долу вляво
+				 * 2. Горе вляво
+				 * 3. Долу вдясно
+				 * 4. Горе вдясно */
 				#if SMOOTH_SHADING == 1
 					/* В този случай викаме glNormal3f преди всеки glVertex3f */
 					glNormal3f(ll->normal.x, ll->normal.y, ll->normal.z);

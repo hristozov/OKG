@@ -116,6 +116,7 @@ void add_point(float x, float y, float z) {
 void fill_polygon_buffer() {
 	printf("Call to fill_polygon_buffer()\n");
 	
+	/* Няма какво да се запълва :) */
 	if (P_SIZE == 0)
 		return;
 		

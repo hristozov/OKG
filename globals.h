@@ -49,10 +49,12 @@ extern int g_y;
  * Първа буква: U=upper ; L=lower
  * Втора буква: L=left ; R=right */
  
+/* Помощен макрос за "нормализиране" на j - индекс на връх или на полигон.
+ * Понеже последния и първия полигон са съседни, този макрос служи за връщане на коректна стойност при избиране на съседите им */
 #define NORMALIZE_J(j) (((j) + no_segments) % no_segments)
 
-#define CHECK_I_P(i) (((i) >= 0) && ((i) < P_SIZE))
-#define GET_P(i, j) ((CHECK_I_P((i))) ? &polygon_buffer[(i)][NORMALIZE_J((j))] : NULL)
+#define CHECK_I_P(i) (((i) >= 0) && ((i) < P_SIZE)) /* Проверка за валиден първи индекс */
+#define GET_P(i, j) ((CHECK_I_P((i))) ? &polygon_buffer[(i)][NORMALIZE_J((j))] : NULL) /* Съшинско обръщение към буфера */
  
 #define GET_LL_P(i, j) (GET_P(i-1, j-1))
 #define GET_UL_P(i, j) (GET_P((i), (j)-1))
@@ -63,8 +65,8 @@ extern int g_y;
  * Отново взимаме предвид, че полигонът [i][j] има връх [i][j] долу вляво
  * Съкращенията са аналогични */
 
-#define CHECK_I_V(i) (((i) >= 0) && ((i) < V_SIZE))
-#define GET_V(i, j) ((CHECK_I_V((i))) ? &vertex_buffer[(i)][NORMALIZE_J((j))] : NULL)
+#define CHECK_I_V(i) (((i) >= 0) && ((i) < V_SIZE)) /* Проверка за валиден първи индекс */
+#define GET_V(i, j) ((CHECK_I_V((i))) ? &vertex_buffer[(i)][NORMALIZE_J((j))] : NULL) /* Съшинско обръщение към буфера */
 
 #define GET_LL_V(i, j) (GET_V((i), (j)))
 #define GET_UL_V(i, j) (GET_V((i)+1, (j)))
@@ -98,5 +100,6 @@ extern struct vertex **vertex_buffer;
 
 extern struct polygon **polygon_buffer;
 
+/* По-удобни начини за взимане на размери: */
 #define V_SIZE buffer_size
-#define P_SIZE (buffer_size > 0 ? (buffer_size-1) : 0)
+#define P_SIZE (buffer_size > 0 ? (buffer_size-1) : 0) /* За да избегнем integer overflow връщаме нула при buffer_size==0 */
