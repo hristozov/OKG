@@ -21,10 +21,14 @@ int diff_x = 0, diff_y = 0;
 /* Ниво на zoom-ване */
 int zoom_level = 40;
 
+/* Спряно ли е въртенето? */
+char rotation_paused = 0;
+
 void lights();
 void drawpolygons();
 void mouse(int, int, int, int);
-void keyboard(int, int, int);
+void keyboard_special(int, int, int);
+void keyboard(unsigned char, int, int);
 void reshape(int, int);
 void rotateSun(int);
 void render();
@@ -183,8 +187,8 @@ void mouse (int button, int state, int mx, int my) {
 	glutPostRedisplay();
 }
 
-/* Callback за клавиатурата. Използва се за въртене. */
-void keyboard (int key, int x, int y) {
+/* "Специален" callback за клавиатурата. Прихваща по-специални клавиши. Използва се за въртене на тялото. */
+void keyboard_special (int key, int x, int y) {
 	switch(key) {
 		case GLUT_KEY_UP:    diff_x -=15; break;
 		case GLUT_KEY_DOWN:  diff_x +=15; break;
@@ -192,6 +196,13 @@ void keyboard (int key, int x, int y) {
 		case GLUT_KEY_RIGHT: diff_y +=15; break;
 	}
 	glutPostRedisplay();
+}
+
+/* Callback за клавиатурата. Прихваща "нормални клавиши" */
+void keyboard (unsigned char key, int x, int y) {
+	switch(key) {
+		case ' ': rotation_paused = (rotation_paused == 0) ? 1:0; break;
+	}
 }
 
 /* Callback за смяна на размера на прозореца */
@@ -204,7 +215,8 @@ void reshape(int x, int y) {
 
 /* Таймер за смяна на позицията на слънцето */
 void rotateSun(int foo) {
-	alpha_degrees += 3;
+	if (rotation_paused == 0) /* Изменяме ъгъла само ако въртенето не е спряно */
+		alpha_degrees += 3;
 	glutTimerFunc(30,rotateSun,0);
 	glutPostRedisplay();
 }
@@ -265,7 +277,8 @@ int main(int argc, char **argv) {
 	
 	glutDisplayFunc(render);
 	glutMouseFunc(mouse);
-	glutSpecialFunc(keyboard);
+	glutSpecialFunc(keyboard_special);
+	glutKeyboardFunc(keyboard);
 	glutTimerFunc(20, rotateSun, 0);
 	
 	glutMainLoop();
