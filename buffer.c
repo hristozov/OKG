@@ -122,9 +122,18 @@ void fill_polygon_buffer() {
 		
 	/* В следващите два цикъла обхождаме всички елементи на vertex_buffer, тоест всички върхове */
 	for (size_t i=0; i < P_SIZE; i++)
-		for (size_t j=0; j < no_segments; j++)
+		for (size_t j=0; j < no_segments; j++) {
 			/* Изчисляваме нормалния вектор на полигона */
 			calculate_normal(&GET_LL_V(i, j)->coord, &GET_UL_V(i, j)->coord, &GET_LR_V(i, j)->coord, &(polygon_buffer[i][j].normal));
+			
+			/* Ако горният край на трапеца се намира в пространството под долния, значи трапецът е обърнат с гръб.
+			 * Обръщаме знака на нормалния вектор, за да може полигонът да се осветява правилно */
+			if ((GET_LL_V(i, j)->coord.y > GET_UL_V(i, j)->coord.y) && (GET_LR_V(i, j)->coord.y > GET_UR_V(i, j)->coord.y)) {
+				polygon_buffer[i][j].normal.x=-polygon_buffer[i][j].normal.x;
+				polygon_buffer[i][j].normal.y=-polygon_buffer[i][j].normal.y;
+				polygon_buffer[i][j].normal.z=-polygon_buffer[i][j].normal.z;
+			}
+		}
 }
 
 #if SORT_CONTROL_POINTS == 1
