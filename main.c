@@ -189,7 +189,7 @@ void keyboard (int key, int x, int y) {
 		case GLUT_KEY_UP:    diff_x -=15; break;
 		case GLUT_KEY_DOWN:  diff_x +=15; break;
 		case GLUT_KEY_LEFT:  diff_y -=15; break;
-		case GLUT_KEY_RIGHT: diff_x +=15; break;
+		case GLUT_KEY_RIGHT: diff_y +=15; break;
 	}
 	glutPostRedisplay();
 }
