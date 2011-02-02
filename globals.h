@@ -32,7 +32,7 @@ extern int g_y;
 #define IS_IN_LEFT_VIEWPORT(x) ((x) < VIEWPORT_BORDER ? 1 : 0)
 #define IS_IN_RIGHT_VIEWPORT(x) ((x) < VIEWPORT_BORDER ? 0 : 1)
 
-/* Дължина на вектор, ползва се предимно за debug */
+/* Дължина на вектор */
 #define VECTOR_LENGTH(pt) ((sqrtf ((pt).x*(pt).x + (pt).y*(pt).y + (pt).z*(pt).z)))
 
 /* Големина на числовия интервал, в който да се проектират точките, избрани с мишката */
