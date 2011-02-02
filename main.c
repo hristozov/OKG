@@ -127,32 +127,32 @@ void drawpolygons() {
 				#endif
 			glEnd();
 			
-			
 			/* Код за debug - показва нормалните вектори на всеки полигон */
 			#if SHOW_POLYGON_NORMALS == 1
-				float sum_x = 0.f, sum_y = 0.f, sum_z = 0.f;
-				for (size_t j=0; j < 4; j++) {
-					sum_x += cur->v[j]->coord.x;
-					sum_y += cur->v[j]->coord.y;
-					sum_z += cur->v[j]->coord.z;
-				}
-
+				float sum_x = ll->coord.x + ul->coord.x + lr->coord.x + ur->coord.x;
+				float sum_y = ll->coord.y + ul->coord.y + lr->coord.y + ur->coord.y;
+				float sum_z = ll->coord.z + ul->coord.z + lr->coord.z + ur->coord.z; 
+				
 				glBegin (GL_LINES);
 					glVertex3f(sum_x*.25f, sum_y*.25f, sum_z*.25f);
 					glVertex3f((sum_x*.25f)+cur->normal.x, (sum_y*.25f)+cur->normal.y, (sum_z*.25f)+cur->normal.z);
 				glEnd();
 			#endif
-			
-			/* Код за debug - показва нормалните вектори на всеки връх */
-			#if SMOOTH_SHADING == 1 && SHOW_VERTEX_NORMALS == 1
-				for (size_t j=0; j < 4; j++) {
-					glBegin (GL_LINES);
-						glVertex3f(cur->v[j]->coord.x, cur->v[j]->coord.y, cur->v[j]->coord.z);
-						glVertex3f(cur->v[j]->coord.x + cur->v[j]->normal.x, cur->v[j]->coord.y + cur->v[j]->normal.y, cur->v[j]->coord.z + cur->v[j]->normal.z);
-					glEnd();
-				}
-			#endif
 		}
+		
+	/* Код за debug - показва нормалните вектори на всеки връх */
+	#if SMOOTH_SHADING == 1 && SHOW_VERTEX_NORMALS == 1
+		for (size_t i = 0; i < V_SIZE; i++)
+			for (size_t j =0; j < no_segments; j++) {
+				glBegin (GL_LINES);
+					glVertex3f(vertex_buffer[i][j].coord.x, vertex_buffer[i][j].coord.y, vertex_buffer[i][j].coord.z);
+					glVertex3f(vertex_buffer[i][j].coord.x + vertex_buffer[i][j].normal.x,
+					           vertex_buffer[i][j].coord.y + vertex_buffer[i][j].normal.y,
+					           vertex_buffer[i][j].coord.z + vertex_buffer[i][j].normal.z);
+				glEnd();
+			}
+	#endif
+
 }
 
 /* drawmodel() рисува ротационното тяло */
