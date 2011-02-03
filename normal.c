@@ -4,6 +4,7 @@
 /* Изчислява нормален вектор като произведение на два вектора с еднакво начало и два края */
 void calculate_normal(struct point *start, struct point *end1, struct point *end2, struct point *normal) {  
 	struct point vector1, vector2;
+	float len;
 	
 	/* Първият вектор */
 	vector1.x = end1->x - start->x;
@@ -19,6 +20,16 @@ void calculate_normal(struct point *start, struct point *end1, struct point *end
 	normal->x = vector1.y*vector2.z - vector1.z*vector2.y;
 	normal->y = vector1.z*vector2.x - vector1.x*vector2.z;
 	normal->z = vector1.x*vector2.y - vector1.y*vector2.x;
+	
+	len = VECTOR_LENGTH(*normal);
+	
+	if (len == 0.f) /* Не нормираме при нулева дължина */
+		return;
+	
+	/* Нормираме */
+	normal->x /= len;
+	normal->y /= len;
+	normal->z /= len;
 }
 
 #if SMOOTH_SHADING == 1 /* Функциите не са ни нужни при flat shading */
