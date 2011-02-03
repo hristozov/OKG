@@ -23,11 +23,20 @@ static int diff_x, diff_y;
 static int zoom_level = 40;
 
 /* Флагови променливи, определящи дали са спрени въртенето и източниците на светлина */
-static char rotation_paused, light0_disabled, light1_disabled;
+static char rotation_paused, light0_disabled, light1_disabled = 1;
 
-void lights();
+/* Текущите координати на курсора на мишката. Използват се при ротациите. */
+static int mouse_x, mouse_y;
+
+/* Дали бутонът на мишката е натиснат? */
+static char mouse_down;
+
+void light0();
+void light1();
 void drawpolygons();
+void drawmodel();
 void mouse(int, int, int, int);
+void mouse_motion(int, int);
 void keyboard_special(int, int, int);
 void keyboard(unsigned char, int, int);
 void reshape(int, int);
@@ -221,24 +230,58 @@ void drawmodel() {
 
 /* Callback за действията с мишката */
 void mouse (int button, int state, int mx, int my) {
-	switch(button) {
-		case GLUT_LEFT_BUTTON:
-			if (IS_IN_RIGHT_VIEWPORT(mx) && state == GLUT_DOWN) {
-				float x = PROJECT_IN_X(mx);
-				float y = PROJECT_IN_Y(my);
+	float x, y;
+	if (IS_IN_RIGHT_VIEWPORT(mx) && state == GLUT_DOWN)  {
+		switch(button) {
+			case GLUT_LEFT_BUTTON:
+				x = PROJECT_IN_X(mx);
+				y = PROJECT_IN_Y(my);
 		
 				printf("Adding point %f %f %f (converted from %d %d %d)\n", x, y, 0.f, mx, my, 0);
 				add_point(x, y, 0);
-			}
-			break;
-		case 3: /* mouse wheel надолу */
-			zoom_level -= 1;
-			break;
-		case 4: /* mouse wheel нагоре */
-			zoom_level += 1;
-			break;
+				break;
+			case 3: /* mouse wheel надолу */
+				zoom_level -= 1;
+				break;
+			case 4:/* mouse wheel нагоре */
+				zoom_level += 1;
+				break;
+		}
+		glutPostRedisplay();
+		return;
 	}
-	glutPostRedisplay();
+	if (IS_IN_LEFT_VIEWPORT(mx)) {
+		if (state == GLUT_DOWN) { /* Бутонът е натиснат в частта за модела */
+			/* Маркираме мишката като натисната и слагаме начални стойности на променливите с координатите й */
+			mouse_down = 1;
+			mouse_x = mx;
+			mouse_y = my;
+		} else { /* state != GLUT_DOWN, тоест мишката вече не е натисната */
+			mouse_down = 0;
+			mouse_x = -1;
+			mouse_y = -1;
+		}
+	}
+}
+
+/* Callback, който отговаря за движенията на мишката.
+ * Viewport-а е важен само при натискането на мишката и тук не го проверяваме */
+void mouse_motion (int mx, int my) {
+	/* Движенията без да е натиснат бутона на мишката не ни засягат */
+	if (mouse_x == -1 || mouse_x == -1 || mouse_down != 1)
+		return;
+	
+	/* Записваме промените на координатите */
+	int dx = mouse_x - mx;
+	int dy = mouse_y - my;
+	
+	/* diff_x определя завъртане около оста X, затова му присвояваме dy. Аналогично за diff_y */
+	diff_x -= dy;
+	diff_y -= dx;
+	
+	/* Обновяваме текущите координати на мишката */
+	mouse_x = mx;
+	mouse_y = my;
 }
 
 /* "Специален" callback за клавиатурата. Прихваща по-специални клавиши. Използва се за въртене на тялото. */
@@ -342,6 +385,7 @@ int main(int argc, char **argv) {
 	
 	glutDisplayFunc(render);
 	glutMouseFunc(mouse);
+	glutMotionFunc(mouse_motion);
 	glutSpecialFunc(keyboard_special);
 	glutKeyboardFunc(keyboard);
 	glutTimerFunc(20, rotateSun0, 0);
