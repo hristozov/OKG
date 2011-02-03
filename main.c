@@ -133,6 +133,10 @@ void drawpolygons() {
 				float sum_y = ll->coord.y + ul->coord.y + lr->coord.y + ur->coord.y;
 				float sum_z = ll->coord.z + ul->coord.z + lr->coord.z + ur->coord.z; 
 				
+				float len = VECTOR_LENGTH (polygon_buffer[i][j].normal);
+				if (len < 0.99f) /* Загуба на точност */
+					printf("WARNING: Polygon normal vector with length %f at index %lu %lu\n", len, i, j);
+				
 				glBegin (GL_LINES);
 					glVertex3f(sum_x*.25f, sum_y*.25f, sum_z*.25f);
 					glVertex3f((sum_x*.25f)+cur->normal.x, (sum_y*.25f)+cur->normal.y, (sum_z*.25f)+cur->normal.z);
@@ -144,6 +148,10 @@ void drawpolygons() {
 	#if SMOOTH_SHADING == 1 && SHOW_VERTEX_NORMALS == 1
 		for (size_t i = 0; i < V_SIZE; i++)
 			for (size_t j =0; j < no_segments; j++) {
+				float len = VECTOR_LENGTH (vertex_buffer[i][j].normal);
+				if (len < 0.99f) /* Загуба на точност */
+					printf("WARNING: Vertex normal vector with length %f at index %lu %lu\n", len, i, j);
+						
 				glBegin (GL_LINES);
 					glVertex3f(vertex_buffer[i][j].coord.x, vertex_buffer[i][j].coord.y, vertex_buffer[i][j].coord.z);
 					glVertex3f(vertex_buffer[i][j].coord.x + vertex_buffer[i][j].normal.x,
