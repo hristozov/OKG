@@ -266,14 +266,12 @@ int main(int argc, char **argv) {
 	if (argc > 1)
 		no_segments = (unsigned) atoi(argv[1]);
 	
-	add_point(0.f, 0.f, 0.f);
 	add_point(1.5f, 2.f, 0.f);
 	add_point(2.f, 1.f, 0.f);
 	add_point(3.f, 5.f, 0.f);
 	add_point(4.f, 5.f, 0.f);
 	add_point(7.f, 8.f, 0.f);
 	add_point(9.f, 9.f, 0.f);
-	
 			
 	glutInit(&argc, argv);
 	
