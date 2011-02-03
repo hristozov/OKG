@@ -261,12 +261,15 @@ void mouse (int button, int state, int mx, int my) {
 			mouse_x = -1;
 			mouse_y = -1;
 		}
+		return;
 	}
 }
 
-/* Callback, който отговаря за движенията на мишката.
- * Viewport-а е важен само при натискането на мишката и тук не го проверяваме */
+/* Callback, който отговаря за движенията на мишката. */
 void mouse_motion (int mx, int my) {
+	if (!IS_IN_LEFT_VIEWPORT(mx)) /* Няма да ротираме, ако курсорът е в грешния viewport */
+		return;
+		
 	/* Движенията без да е натиснат бутона на мишката не ни засягат */
 	if (mouse_x == -1 || mouse_x == -1 || mouse_down != 1)
 		return;
@@ -282,6 +285,8 @@ void mouse_motion (int mx, int my) {
 	/* Обновяваме текущите координати на мишката */
 	mouse_x = mx;
 	mouse_y = my;
+	
+	glutPostRedisplay();
 }
 
 /* "Специален" callback за клавиатурата. Прихваща по-специални клавиши. Използва се за въртене на тялото. */
