@@ -13,17 +13,17 @@
 #include "normal.h"
 
 /* Градусите за ротиране на "слънцето" */
-int alpha_degrees_0 = 0;
-int alpha_degrees_1 = 0;
+static int alpha_degrees_0;
+static int alpha_degrees_1;
 
 /* На колко градуса да се завърти относно x и y */
-int diff_x = 0, diff_y = 0;
+static int diff_x, diff_y;
 
 /* Ниво на zoom-ване */
-int zoom_level = 40;
+static int zoom_level = 40;
 
 /* Флагови променливи, определящи дали са спрени въртенето и източниците на светлина */
-char rotation_paused = 0, light0_disabled = 0, light1_disabled = 1;
+static char rotation_paused, light0_disabled, light1_disabled;
 
 void lights();
 void drawpolygons();
