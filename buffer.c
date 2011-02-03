@@ -75,6 +75,9 @@ void buffer_kill() {
  * Оста има координати (0, y, 0)
  */
 void add_point(float x, float y, float z) {
+	if (x == 0.f) /* Точката е върху оста Y */
+		return;
+	
 	/* Проверяваме дали точката вече не е добавена и излизаме, ако това е вярно */
 	for (size_t i=0; i < V_SIZE; i++)
 		if (vertex_buffer[i][0].coord.x == x && vertex_buffer[i][0].coord.y == y && vertex_buffer[i][0].coord.z == z)
