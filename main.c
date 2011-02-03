@@ -23,7 +23,7 @@ int diff_x = 0, diff_y = 0;
 int zoom_level = 40;
 
 /* Флагови променливи, определящи дали са спрени въртенето и източниците на светлина */
-char rotation_paused = 0, light0_disabled = 0, light1_disabled = 0;
+char rotation_paused = 0, light0_disabled = 0, light1_disabled = 1;
 
 void lights();
 void drawpolygons();
