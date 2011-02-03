@@ -13,7 +13,8 @@
 #include "normal.h"
 
 /* Градусите за ротиране на "слънцето" */
-int alpha_degrees = 0;
+int alpha_degrees_0 = 0;
+int alpha_degrees_1 = 0;
 
 /* На колко градуса да се завърти относно x и y */
 int diff_x = 0, diff_y = 0;
@@ -21,8 +22,8 @@ int diff_x = 0, diff_y = 0;
 /* Ниво на zoom-ване */
 int zoom_level = 40;
 
-/* Спряно ли е въртенето? */
-char rotation_paused = 0;
+/* Флагови променливи, определящи дали са спрени въртенето и източниците на светлина */
+char rotation_paused = 0, light0_disabled = 0, light1_disabled = 0;
 
 void lights();
 void drawpolygons();
@@ -33,8 +34,13 @@ void reshape(int, int);
 void rotateSun(int);
 void render();
 
-/* lights() наглася източника на осветление */
-void lights() {
+/* light0() наглася първия източник на осветление */
+void light0() {
+	if (light0_disabled != 0) { /* Ако флагът е вдигнат, спираме източника */
+		glDisable(GL_LIGHT0);
+		return;
+	}
+	
 	static float near_white[] = {.45f, .45f, .5f, 1.f};
 	static float orange[] = {.4f, .3f, .1f, 1.f};
 
@@ -56,10 +62,50 @@ void lights() {
 	glPushMatrix();
 
 		glRotatef(28, 0, 0, 1);
-		glRotatef(alpha_degrees,0,1,0);
+		glRotatef(alpha_degrees_0,0,1,0);
 		glTranslatef(-25,0,0);
 	
 		glLightfv(GL_LIGHT0, GL_POSITION, pos);
+
+		glMaterialfv(GL_FRONT, GL_EMISSION, yellow);
+		glutSolidSphere(3,20,20);
+		glMaterialfv(GL_FRONT, GL_EMISSION, black);
+
+	glPopMatrix();
+}
+
+/* light1() наглася втория източник на осветление */
+void light1() {
+	if (light1_disabled != 0) { /* Ако флагът е вдигнат, спираме източника */
+		glDisable(GL_LIGHT1);
+		return;
+	}
+	
+	static float near_white[] = {.45f, .45f, .5f, 1.f};
+	static float orange[] = {.4f, .3f, .1f, 1.f};
+
+	static float black[] = {.0f, .0f, .0f, 1.f};
+	/* static float white[] = {1.f, 1.f, 1.f, 1.f}; */
+	static float yellow[] = {.99f, .8f, .0f, 1.f};
+
+	static float pos[] = {0.f, 0.f, 0.f, 1.f};
+
+	glEnable(GL_LIGHTING);
+    glLightModelfv( GL_LIGHT_MODEL_AMBIENT, black ); 
+
+	glEnable(GL_LIGHT1);
+	glLightfv(GL_LIGHT1, GL_AMBIENT, near_white);
+	glLightfv(GL_LIGHT1, GL_DIFFUSE, orange);
+	glLightfv(GL_LIGHT1, GL_SPECULAR, black);
+	
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+
+		glRotatef(28, 0, 0, 1);
+		glRotatef(alpha_degrees_1,0,1,0);
+		glTranslatef(25,0,0);
+	
+		glLightfv(GL_LIGHT1, GL_POSITION, pos);
 
 		glMaterialfv(GL_FRONT, GL_EMISSION, yellow);
 		glutSolidSphere(3,20,20);
@@ -206,10 +252,13 @@ void keyboard_special (int key, int x, int y) {
 	glutPostRedisplay();
 }
 
-/* Callback за клавиатурата. Прихваща "нормални клавиши" */
+/* Callback за клавиатурата. Прихваща "нормални клавиши"
+ * В момента служи само за смяна на флагове при натискане на даден клавиш */
 void keyboard (unsigned char key, int x, int y) {
 	switch(key) {
 		case ' ': rotation_paused = (rotation_paused == 0) ? 1:0; break;
+		case '1': light0_disabled = (light0_disabled == 0) ? 1:0; break;
+		case '2': light1_disabled = (light1_disabled == 0) ? 1:0; break;
 	}
 }
 
@@ -222,10 +271,18 @@ void reshape(int x, int y) {
 }
 
 /* Таймер за смяна на позицията на слънцето */
-void rotateSun(int foo) {
+void rotateSun0(int foo) {
 	if (rotation_paused == 0) /* Изменяме ъгъла само ако въртенето не е спряно */
-		alpha_degrees += 3;
-	glutTimerFunc(30,rotateSun,0);
+		alpha_degrees_0 += 3;
+	glutTimerFunc(30,rotateSun0,0);
+	glutPostRedisplay();
+}
+
+/* Таймер за смяна на позицията на слънцето */
+void rotateSun1(int foo) {
+	if (rotation_paused == 0) /* Изменяме ъгъла само ако въртенето не е спряно */
+		alpha_degrees_1 -= 2;
+	glutTimerFunc(30,rotateSun1,0);
 	glutPostRedisplay();
 }
 
@@ -251,8 +308,10 @@ void render() {
 
 	gluPerspective(60,1,2,200);
 	gluLookAt(1,1,zoom_level,0,7,0,0,1,0);
-	
-	lights();
+			
+	light0();
+	light1();
+			
 	drawmodel();
 	
 	glFlush();
@@ -285,7 +344,8 @@ int main(int argc, char **argv) {
 	glutMouseFunc(mouse);
 	glutSpecialFunc(keyboard_special);
 	glutKeyboardFunc(keyboard);
-	glutTimerFunc(20, rotateSun, 0);
+	glutTimerFunc(20, rotateSun0, 0);
+	glutTimerFunc(20, rotateSun1, 0);
 	
 	glutMainLoop();
 	
