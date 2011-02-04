@@ -231,22 +231,18 @@ void drawmodel() {
 /* Callback за действията с мишката */
 void mouse (int button, int state, int mx, int my) {
 	float x, y;
-	if (IS_IN_RIGHT_VIEWPORT(mx) && state == GLUT_DOWN)  {
-		switch(button) {
-			case GLUT_LEFT_BUTTON:
-				x = PROJECT_IN_X(mx);
-				y = PROJECT_IN_Y(my);
+	if (button == 3)
+		zoom_level -= 1;
 		
-				printf("Adding point %f %f %f (converted from %d %d %d)\n", x, y, 0.f, mx, my, 0);
-				add_point(x, y, 0);
-				break;
-			case 3: /* mouse wheel надолу */
-				zoom_level -= 1;
-				break;
-			case 4:/* mouse wheel нагоре */
-				zoom_level += 1;
-				break;
-		}
+	if (button == 4)
+		zoom_level += 1;
+		
+	if (IS_IN_RIGHT_VIEWPORT(mx) && state == GLUT_DOWN && button == GLUT_LEFT_BUTTON)  {
+		x = PROJECT_IN_X(mx);
+		y = PROJECT_IN_Y(my);
+		
+		printf("Adding point %f %f %f (converted from %d %d %d)\n", x, y, 0.f, mx, my, 0);
+		add_point(x, y, 0);
 		glutPostRedisplay();
 		return;
 	}
